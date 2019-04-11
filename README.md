@@ -4,6 +4,11 @@ Please note that these files are for the good of shortcuts (or bad?) and to make
 Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
+
+### v1.0004
+- removed sciNav and sciMath :(
+- however, I transported sciMath data to sciMain.js :)
+
 ### v1.0003
 - fixed ; in object
 - added hasDocumentBody

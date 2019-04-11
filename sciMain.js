@@ -51,7 +51,7 @@
 			};
 		} )();
 	}
-	var VERSION = "1.0002";
+	var VERSION = "1.0003";
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//FUNCTIONS (sure nuff any function with // end is exported from bottom)
 	function addClass(elm, cls) {elm.classList.add(cls)}//
@@ -603,10 +603,11 @@
 		return elm;
 	};
 	Object.assign(exports.getSingleElement, {
-		normal: function(id) {return getElements(id)};
+		normal: function(id) {return getElements(id)},
 		warning: function() {console.warn("sci.getSingleElement: Please note that the id must not be specific (i.e. only id, not document.getElementById(id)).")}
 	});
 	exports.hasConsole = function() {return typeof console !== "undefined"};
+	exports.hasDocumentBody = function() {return document.body !== undefined};
 	exports.IsBinaricBoolean = function(arg) {return (arg==0 || arg==1)};
 	exports.IsBoolean = function(arg) {return typeof arg === "boolean"};
 	exports.IsEqualStyle = function(elm1style, elm2style) {return elm1style===elm2style};

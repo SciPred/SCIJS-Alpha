@@ -11,6 +11,8 @@
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = {}));
 }(this, function (exports) {'use strict';
+	var VERSION = "1.00";
+	console.log("SciPred\'s JS " + VERSION); //info
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)
 	if ( Math.sign === undefined ) {

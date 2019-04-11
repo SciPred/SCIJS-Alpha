@@ -51,7 +51,7 @@
 			};
 		} )();
 	}
-	var VERSION = "1.0001";
+	var VERSION = "1.0002";
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//FUNCTIONS (sure nuff any function with // end is exported from bottom)
 	function addClass(elm, cls) {elm.classList.add(cls)}//
@@ -563,6 +563,31 @@
 	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
+	exports.generateRandomArray = function(len, items, replacee) {
+		var arr = replacee || [];
+		var tems = items || exports.randomSciIDVars;
+		for (var i=0; i<len; i++) {
+			arr[i] = tems[i];
+		}
+		if (replacee !== undefined) {replacee = arr;return replacee} else {return arr}
+	};
+	exports.generateRandomSciID = function(len, randlen, replacee) { //using randomSciIDVars
+		var str = "";
+		var rlen = randlen || 1;
+		for (var i=0; i<len; i++) {
+			rlen = exports.choose(exports.randomSciIDVars);
+			str += exports.summation(rlen, true);
+		}
+		if (replacee !== undefined) {replacee = str;return replacee} else {return str}
+	};
+	exports.generateRandomString = function(len, replacee, rands) { //rands is last because it might be very long
+		str = "";
+		if(Array.isArray(rands)==false){console.warn("sci.generateRandomString: rands is undefined, using sci.randomSciIDVars");rands=exports.randomSciIDVars}
+		for (var i=0; i<len; i++) {
+			str = exports.choose(rands);
+		}
+		if (replacee !== undefined) {replacee = str;return replacee} else {return str}
+	};
 	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
 	exports.getByTagNS = function(nsuri, tag) {return document.getElementsByTagNameNS(nsuri, tag)};
 	Object.assign(exports.getByTagNS, {
@@ -608,6 +633,14 @@
 	Object.assign(exports.posate, {
 		warning: function() {console.warn("sci.posate: Please note that the function used is n=Math.abs(n), not n=-n.")}
 	});
+	exports.randomSciIDVars = [
+	    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+	    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+	    "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+	    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+	    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+	    "-", "_", "$", "&", "#", "@"
+	];
 	exports.removeClass = function (sel, name) {
         exports.removeClassElements(getElements(sel), name);
     };
@@ -628,6 +661,14 @@
             exports.removeClassElement(elements[i], name);
         }
     };
+    exports.repeatItemArray = function(len, items, replacee) {
+		var arr = replacee || [];
+		if (items === undefined) {console.warn("sci.repeatItemArray: items is/are not defined, using empty array");items=[]}
+		for (var i=0; i<len; i++) {
+			if (items.length==1) {arr[i]=items} else {arr[i] = items[i]}
+		}
+	    return arr;
+	};
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
         if (!isNaN(ms) || ms == 0) {
@@ -659,6 +700,13 @@
         }
         ss.start();
         return ss;
+    };
+    exports.summation = function(values, isString) {
+    	var count=0; if (isString) {count=""}
+    	for (var i=0; i<values.length; i++) {
+    		count += values[i];
+    	}
+    	return count;
     };
 	exports.switchSign = function(n) {n=-n;return n};
 	exports.toggleClassElement = function (element, c1, c2) {

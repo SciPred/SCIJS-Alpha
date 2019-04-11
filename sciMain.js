@@ -11,8 +11,6 @@
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = {}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.00";
-	console.log("SciPred\'s JS " + VERSION); //info
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)
 	if ( Math.sign === undefined ) {
@@ -53,6 +51,8 @@
 			};
 		} )();
 	}
+	var VERSION = "1.0001";
+	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//FUNCTIONS (sure nuff any function with // end is exported from bottom)
 	function addClass(elm, cls) {elm.classList.add(cls)}//
 	function arrayEqualsItem(arr, num, eq) {return arr[num]==eq}//
@@ -560,19 +560,25 @@
 	exports.clearConsole = function() {console.clear()};
 	exports.click = function(btn) {btn.click()};
 	exports.close = function() {document.close()};
+	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
+	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
 	exports.getByTagNS = function(nsuri, tag) {return document.getElementsByTagNameNS(nsuri, tag)};
 	Object.assign(exports.getByTagNS, {
 		normal: function(tag) {return getByTag(tag)},
 		warning: function() {console.warn("sci.getByTagNS: Please note that this may not work in earlier versions, beta versions or other software or apps.")}
 	});
+	exports.getLength = function(obj) {return obj.length};
+	exports.getName = function(obj) {return obj.name};
+	exports.getPrototype = function(obj) {if (obj.prototype !== undefined) {return obj.prototype} else {console.error("sci.getPrototype: obj.prototype is undefined.")}};
 	exports.getSingleElement = function(id, n) {
 		var i = n || 0;
 		var elm = document.getElementById(id) || document.getElementsByName(id)[i] || document.getElementsByClassName(id)[i] || document.getElementsByTagName(id)[i] || id[i];
 		return elm;
-	}
+	};
 	Object.assign(exports.getSingleElement, {
+		normal: function(id) {return getElements(id)};
 		warning: function() {console.warn("sci.getSingleElement: Please note that the id must not be specific (i.e. only id, not document.getElementById(id)).")}
 	});
 	exports.hasConsole = function() {return typeof console !== "undefined"};
@@ -623,6 +629,37 @@
         }
     };
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
+	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
+        if (!isNaN(ms) || ms == 0) {
+            ss.milliseconds = ms;
+        } else {
+            ss.milliseconds = 1000;
+        }
+        ss.start = function() {
+            ss.display(ss.current)
+            if (ss.ondisplaychange) {ss.ondisplaychange();}
+            if (ss.milliseconds > 0) {
+                window.clearTimeout(ss.timeout);
+                ss.timeout = window.setTimeout(ss.next, ss.milliseconds);
+            }
+        };
+        ss.next = function() {
+            ss.current += 1;
+            if (ss.current > ss.x.length) {ss.current = 1;}
+            ss.start();
+        };
+        ss.previous = function() {
+            ss.current -= 1;
+            if (ss.current < 1) {ss.current = ss.x.length;}
+            ss.start();
+        };
+        ss.display = function (n) {
+            styleElements(ss.x, "display", "none");
+            styleElement(ss.x[n - 1], "display", "block");
+        }
+        ss.start();
+        return ss;
+    };
 	exports.switchSign = function(n) {n=-n;return n};
 	exports.toggleClassElement = function (element, c1, c2) {
         var t1, t2, t1Arr, t2Arr, j, arr, allPresent;
@@ -666,15 +703,18 @@
     	else {return "undefined"}
     };
 	exports.typeOfBeta=function(arg) {return typeof arg};
+	exports.valOf = function(obj) {var o=obj || exports; return o};
 
     //SETUP STUFF
 	exports.constructor = exports;
+	exports.constructor.IS_EXPORTS_DEPENDENT = true;
+	exports.constructor.IS_SCI = true;
 	//using x as the problem (by console.errors)
 	exports.ERR_LOAD_RESOURCE_FAILED = "Failed to load resource: the server responded with a status of 403 ()";
 	exports.ERR_NAME_NOT_RESOLVED = "Failed to load resource: net::ERR_NAME_NOT_RESOLVED";
 	exports.ERR_REFERENCE_UNDEFINED = "Uncaught ReferenceError: x is not defined";
 	exports.ERR_SYNTAX_UNEXPECTED_IDENTIFIER = "Uncaught SyntaxError: Unexpected identifier";
-	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token )";
+	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token x";
 	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE = "Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be accessed on strict mode functions or the arguments objects for calls to them";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
 	

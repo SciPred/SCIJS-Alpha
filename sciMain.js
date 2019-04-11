@@ -756,7 +756,7 @@
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;
-	var VERSION = "1.0004";
+	var VERSION = "1.0005";
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//using x as the problem (by console.errors)
 	exports.ERR_LOAD_RESOURCE_FAILED = "Failed to load resource: the server responded with a status of 403 ()";
@@ -809,18 +809,46 @@ sciMath.data.standardDeviation = function(values){var avg=sciMath.mean(values);v
 };
 sciMath.data.variance = function(values){var sd=sciMath.data.standardDeviation(values);return sd**2;};
 
-//geometry
+//geometry (moar)
 sciMath.geometry = {
-	//regular polygons only
-	area: function(perimeter, apothem){if(apothem==null){console.error("apothem is not defined")}else{return (perimeter*apothem)/2}},
-	circumference: function(radius){return 2*r*Math.PI},
-    perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
-}
+	area: {
+		annulus: function(r1, r2) {return Math.PI*(r1-r2)},
+		circle: function(r) {return Math.PI*(r*r)},
+		rectangle: function(l, w) {return l*w},
+		square: function(s) {return s*s},
+		triangle: function(b, h) {return (b*h)/2}
+	},
+	perimeter: {
+		rectangle: function(l, w) {return 2*(l+w)},
+		square: function(s) {return s*4},
+		triangle: function(a, b, c) {
+			var d = a || 1;
+			var e = b || d;
+			var f = c || e;
+			return d+e+f;
+		}
+	},
+	tsa: {
+		cube: function(s) {return 6*(s*s)},
+		prismRectangular: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
+		sphere: function(r) {return 4*Math.PI*(r**2)},
+		tube: function(h, r1, r2) {
+			var a = r1**2, b = r2**2, p = 2*Math.PI;
+			return p*((a-b)+(h*(a+b)));
+		}
+	},
+	volume: {
+		cube: function(s) {return s**3},
+		prismRectangular: function(l, w, h) {return l*w*h},
+		sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b}
+	}
+};
 
+//logarithm
 sciMath.logarithm = {
 	LOG2: function(n){return Math.log2(n)},
 	log: function(n){return Math.log(n)}
-}
+};
 
 //numFuncs
 sciMath.numberFunctions = {
@@ -849,7 +877,7 @@ sciMath.numberFunctions = {
 		square: function(n){return Math.sqrt(n)}
 	},
 	sign: function(x){if(x==NaN){return NaN}else{return Math.sign(x)}}
-}
+};
 
 
 //numbers
@@ -878,6 +906,14 @@ sciMath.numberValues = {
 	piMath: Math.PI,
 	piOverE: Math.PI / Math.E,
 	undefined: undefined
+};
+
+//geometry (regular)
+sciMath.regularGeometry = {
+	//regular polygons only
+	area: function(perimeter, apothem){if(apothem==null){console.error("apothem is not defined")}else{return (perimeter*apothem)/2}},
+	circumference: function(radius){return 2*r*Math.PI},
+    perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
 };
 
 //x

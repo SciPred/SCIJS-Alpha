@@ -5,6 +5,12 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0006
+- added sci.sign and sci.generateRandomNumber
+- added some more geometry calculations
+- fixed sci.generateRandomArray because it wasn't random
+- some more commands (toggle, transistorGates, etc.)
+
 ### v1.0005
 - added a few sciMath geometry functions
 

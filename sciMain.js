@@ -565,9 +565,17 @@
 		var arr = replacee || [];
 		var tems = items || exports.randomSciIDVars;
 		for (var i=0; i<len; i++) {
-			arr[i] = tems[i];
+			arr[i] = exports.choose(tems);
 		}
 		if (replacee !== undefined) {replacee = arr;return replacee} else {return arr}
+	};
+	exports.generateRandomNumber = function(len, replacee, rands) {
+		var num = "", arr = rands || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		for (var i=0; i<len; i++) {
+			num += exports.choose(arr);
+		}
+		var n = Number(num);
+		if (replacee !== undefined) {replacee = n;return replacee} else {return n}
 	};
 	exports.generateRandomSciID = function(len, randlen, replacee) { //using randomSciIDVars
 		var str = "";
@@ -616,6 +624,8 @@
 	exports.IsTrue = function(bool) {return bool===true};
 	exports.IsUndefinedByTypeof = function(arg) {return typeof arg === "undefined"};
 	exports.logAllVariables = function() {for(var b in window){if(window.hasOwnProperty(b)){console.log(b)}}};
+	exports.makeFalse = function(replacee) {replacee=false;return replacee};
+	exports.makeTrue = function(replacee) {replacee=true;return replacee};
 	exports.negate = function(n) {if (IsPositive(n)) {n=-n;return n} else {console.warn("sci.negate: number is already negative: " + n);return n}}
 	exports.negateBeta = function(n) {n=-n};
 	exports.new = function(func) {var arg=func || Object;return new arg};
@@ -624,6 +634,7 @@
 	});
 	exports.newArray = function() {return new Array()};
 	exports.newBoolean = function() {return new Boolean()};
+	exports.newDate = function() {return new Date()};
 	exports.newFunction = function() {return new Function()};
 	exports.newObject = function() {return new Object()};
 	exports.ownCons = function() {return exports};
@@ -638,7 +649,7 @@
 	    "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
 	    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
 	    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-	    "-", "_", "$", "&", "#", "@"
+	    "-", "_", "$", "&", "#", "@", "?"
 	];
 	exports.removeClass = function (sel, name) {
         exports.removeClassElements(getElements(sel), name);
@@ -669,6 +680,13 @@
 	    return arr;
 	};
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
+	exports.sign = function(n) {
+		if (n<0) {return -1}
+		else if (n==0 || n==false)  {return 0}
+		else if (n>0 || n==true) {return 1}
+		else if (n===undefined) {return undefined}
+		else {return NaN}
+	};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
         if (!isNaN(ms) || ms == 0) {
             ss.milliseconds = ms;
@@ -708,6 +726,12 @@
     	return count;
     };
 	exports.switchSign = function(n) {n=-n;return n};
+	exports.toggleArrayItem = function(arr, n, val) {
+		var olditem = arr[n], newitem = val;
+		if (arr[n]==olditem) {arr[n]=newitem}
+		else {arr[n]=olditem}
+		return arr;
+	};
 	exports.toggleClassElement = function (element, c1, c2) {
         var t1, t2, t1Arr, t2Arr, j, arr, allPresent;
         t1 = (c1 || "");
@@ -739,6 +763,26 @@
             }
         }
     };
+    exports.toggleObjectValue = function(obj, val) {
+    	var oldobj = obj, newobj = val;
+    	if (obj==oldobj) {obj=newobj}
+    	else {obj=oldobj}
+    	return obj;
+    };
+    exports.traceFunc = function() {console.trace()};
+    exports.transistorGates = { //shows the ON or HIGH conditions
+    	AND: [1, 1],
+    	NAND: function(a, b) {
+    		if (a==0) {a=1} else {a=0}
+    		if (b==0) {b=1} else {b=0}
+    		return [a, b];
+    	},
+    	NOR: [0, 0],
+    	NOT: function(a) {if (a==0) {return 1} else {return 0}},
+    	OR: [[1, 0], [0, 1], [1, 1]],
+    	XNOR: [[0, 0], [1, 1]],
+    	XOR: [[1, 0], [0, 1]]
+    };
     exports.typeOf = function(arg) { //a more specific typeof
     	if (arg===true || arg===false) {return "boolean"}
     	else if (typeof arg === "function") {return "function"}
@@ -753,14 +797,16 @@
 	exports.valOf = function(obj) {var o=obj || exports; return o};
 
     //SETUP STUFF
+	var VERSION = "1.0006";
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;
-	var VERSION = "1.0005";
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//using x as the problem (by console.errors)
 	exports.ERR_LOAD_RESOURCE_FAILED = "Failed to load resource: the server responded with a status of 403 ()";
+	exports.ERR_LOAD_RESOURCE_NETFAILED = "Failed to load resource: net::ERR_FAILED";
 	exports.ERR_NAME_NOT_RESOLVED = "Failed to load resource: net::ERR_NAME_NOT_RESOLVED";
+	exports.ERR_REFERENCE_INVALID_ASSIGNMENT = "Uncaught ReferenceError: Invalid left-hand side in assignment";
 	exports.ERR_REFERENCE_UNDEFINED = "Uncaught ReferenceError: x is not defined";
 	exports.ERR_SYNTAX_UNEXPECTED_IDENTIFIER = "Uncaught SyntaxError: Unexpected identifier";
 	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token x";
@@ -814,13 +860,23 @@ sciMath.geometry = {
 	area: {
 		annulus: function(r1, r2) {return Math.PI*(r1-r2)},
 		circle: function(r) {return Math.PI*(r*r)},
+		circleLog: function(c, d) {return c*d/4},
 		rectangle: function(l, w) {return l*w},
+		rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
 		square: function(s) {return s*s},
+		trapezium: function(a, c, h) {return h*((a+c)/2)},
 		triangle: function(b, h) {return (b*h)/2}
 	},
 	perimeter: {
 		rectangle: function(l, w) {return 2*(l+w)},
 		square: function(s) {return s*4},
+		trapezium: function(a, b, c, d) {
+			var e = a || 1;
+			var f = b || e;
+			var g = c || f;
+			var h = d || g;
+			return e+f+g+h;
+		},
 		triangle: function(a, b, c) {
 			var d = a || 1;
 			var e = b || d;
@@ -830,7 +886,8 @@ sciMath.geometry = {
 	},
 	tsa: {
 		cube: function(s) {return 6*(s*s)},
-		prismRectangular: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
+		cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
+		cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
 		sphere: function(r) {return 4*Math.PI*(r**2)},
 		tube: function(h, r1, r2) {
 			var a = r1**2, b = r2**2, p = 2*Math.PI;
@@ -838,8 +895,10 @@ sciMath.geometry = {
 		}
 	},
 	volume: {
+		cone: function(r, h) {var a=Math.PI*(1/3),b=r*r*h;return a*b},
 		cube: function(s) {return s**3},
-		prismRectangular: function(l, w, h) {return l*w*h},
+		cuboid: function(l, w, h) {return l*w*h},
+		cylinder: function(r, h) {return Math.PI*(r*r)*h},
 		sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b}
 	}
 };
@@ -848,6 +907,13 @@ sciMath.geometry = {
 sciMath.logarithm = {
 	LOG2: function(n){return Math.log2(n)},
 	log: function(n){return Math.log(n)}
+};
+
+//nth
+sciMath.nth = {
+	evenNumber: function(nth) {return 2*nth},
+	fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
+	oddNumber: function(nth) {return nth+(nth-1)}
 };
 
 //numFuncs

@@ -5,6 +5,17 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0007
+- converted sciMath to part of sci (i.e. sciMath.data => sci.data)
+- changed isPerfect to isPerfectWhole
+- changed piFullString to piLongerString (realized PI was not full)
+- changed regularGeometry to regularPolygonGeometry
+- added sci.numberValues.EPSILON and Number attributes
+- added IsSafeInteger and numberFunctions.isInteger
+- added a bunch more functions and variables
+- removed numberFunctions.e() :(
+- added 2 strict mode errors
+
 ### v1.0006
 - added sci.sign and sci.generateRandomNumber
 - added some more geometry calculations

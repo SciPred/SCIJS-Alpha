@@ -547,6 +547,9 @@
 	exports.getByTag = getByTag;
 	exports.getElements = getElements;
 
+
+
+
 	/* actuals (totally my own ideas) */
 	//FUNCTIONS
 	exports.addClass = function (sel, name) {exports.addClassElements(getElements(sel), name)};
@@ -554,14 +557,45 @@
         for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
     };
     exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
+    exports.arithmetic = {
+        bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
+        dec: function(n, dec){if(dec==null){n--}else{n-=dec}},
+        difference: function(a, b){return a-b},
+        inc: function(n, inc){if(inc==null){n++}else{n+=inc}},
+        multiplication: function(val){var x=val.length,count=1;for(var i = 0; i < x; i++){count *= val[i];}return count},
+ 	    summation: function(val){var x=val.length,count=0;for(var i = 0; i < x; i++){count += val[i];}return count}
+    };
     exports.choose = function(arr) {return arr[Math.floor(Math.random()*arr.length)]};
 	exports.clearConsole = function() {console.clear()};
 	exports.click = function(btn) {btn.click()};
 	exports.close = function() {document.close()};
+	exports.data = {
+     	max: function(val){return Math.max(val)},
+     	mean: function(val){var x = val.length,count = 0;for(var i = 0; i < x; i++){count += val[i];}return count/x;},
+ 	    //for the median, values can now be unorganized:
+ 	    median: function(val){
+ 	    	if (exports.numberFunctions.isEven(val.length)) {var x=val.sort();return (x[((x.length + 2)/2)-2]+x[((x.length + 2)/2)-1])/2}
+ 	    	else {var x=val.sort();return x[((x.length + 1)/2)-1]}
+ 	    },
+     	min: function(val){return Math.min(val)},
+ 	    mode: function(arr){return arr.reduce(function(current, item){var val=current.numMapping[item]=(current.numMapping[item]||0)+1;
+            if(val>current.greatestFreq){current.greatestFreq=val;current.mode=item;}return current;},
+            {mode:null,greatestFreq:-Infinity,numMapping:{}}).mode;
+        },
+ 	    range: function(val){return Math.max(val)-Math.min(val)}
+    };
+    exports.data.meanDeviation = function(values){var avg=exports.data.mean(values);var squareDiffs=values.map(function(value){var diff=value-avg;return diff;});
+        var avgSquareDiff=exports.data.mean(squareDiffs);return avgSquareDiff;
+    };
+    exports.data.standardDeviation = function(values){var avg=exports.data.mean(values);var squareDiffs=values.map(function(value){var diff=value-avg;
+        var sqrDiff=diff*diff;return sqrDiff;});var avgSquareDiff=exports.data.mean(squareDiffs);var stdDev = Math.sqrt(avgSquareDiff);return stdDev;
+    };
+    exports.data.variance = function(values){var sd=exports.data.standardDeviation(values);return sd**2;};
 	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
-	exports.generateRandomArray = function(len, items, replacee) {
+	exports.ErrorStackTraceLimit = Error.stackTraceLimit;
+	exports.generateRandomArray = function(len, replacee, items) {
 		var arr = replacee || [];
 		var tems = items || exports.randomSciIDVars;
 		for (var i=0; i<len; i++) {
@@ -586,6 +620,7 @@
 		}
 		if (replacee !== undefined) {replacee = str;return replacee} else {return str}
 	};
+	exports.generateRandomSciIDArray = function(len, replacee) {exports.generateRandomArray(len, replacee)};
 	exports.generateRandomString = function(len, replacee, rands) { //rands is last because it might be very long
 		str = "";
 		if(Array.isArray(rands)==false){console.warn("sci.generateRandomString: rands is undefined, using sci.randomSciIDVars");rands=exports.randomSciIDVars}
@@ -594,6 +629,52 @@
 		}
 		if (replacee !== undefined) {replacee = str;return replacee} else {return str}
 	};
+	exports.geometry = {
+    	area: {
+	    	annulus: function(r1, r2) {return Math.PI*(r1-r2)},
+	    	circle: function(r) {return Math.PI*(r*r)},
+		    circleLog: function(c, d) {return c*d/4},
+		    rectangle: function(l, w) {return l*w},
+		    rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
+		    square: function(s) {return s*s},
+		    trapezium: function(a, c, h) {return h*((a+c)/2)},
+		    triangle: function(b, h) {return (b*h)/2}
+	    },
+	    perimeter: {
+		    rectangle: function(l, w) {return 2*(l+w)},
+		    square: function(s) {return s*4},
+		    trapezium: function(a, b, c, d) {
+			    var e = a || 1;
+			    var f = b || e;
+			    var g = c || f;
+			    var h = d || g;
+			    return e+f+g+h;
+		    },
+		    triangle: function(a, b, c) {
+			    var d = a || 1;
+			    var e = b || d;
+			    var f = c || e;
+			    return d+e+f;
+		    }
+	    },
+	    tsa: {
+		    cube: function(s) {return 6*(s*s)},
+		    cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
+		    cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
+		    sphere: function(r) {return 4*Math.PI*(r**2)},
+		    tube: function(h, r1, r2) {
+		    	var a = r1**2, b = r2**2, p = 2*Math.PI;
+			    return p*((a-b)+(h*(a+b)));
+		    }
+	    },
+	    volume: {
+		    cone: function(r, h) {var a=Math.PI*(1/3),b=r*r*h;return a*b},
+		    cube: function(s) {return s**3},
+		    cuboid: function(l, w, h) {return l*w*h},
+		    cylinder: function(r, h) {return Math.PI*(r*r)*h},
+		    sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b}
+	    }
+    };
 	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
 	exports.getByTagNS = function(nsuri, tag) {return document.getElementsByTagNameNS(nsuri, tag)};
 	Object.assign(exports.getByTagNS, {
@@ -614,18 +695,29 @@
 	});
 	exports.hasConsole = function() {return typeof console !== "undefined"};
 	exports.hasDocumentBody = function() {return document.body !== undefined};
+	exports.hasWebWorker = function() {return typeof Worker !== undefined};
 	exports.IsBinaricBoolean = function(arg) {return (arg==0 || arg==1)};
 	exports.IsBoolean = function(arg) {return typeof arg === "boolean"};
 	exports.IsEqualStyle = function(elm1style, elm2style) {return elm1style===elm2style};
 	exports.IsFalse = function(bool) {return bool===false};
 	exports.IsFunction = function(arg) {return typeof arg === "function"};
 	exports.IsObject = function(arg) {return typeof arg === "object"};
+	exports.IsSafeInteger = function(int) {return Number.isSafeInteger(int)};
 	exports.IsString = function(arg) {return typeof arg === "string"};
 	exports.IsTrue = function(bool) {return bool===true};
 	exports.IsUndefinedByTypeof = function(arg) {return typeof arg === "undefined"};
 	exports.logAllVariables = function() {for(var b in window){if(window.hasOwnProperty(b)){console.log(b)}}};
+	exports.logarithm = {
+	    LOG2: function(n){return Math.log2(n)},
+	    log: function(n){return Math.log(n)}
+    };
+	exports.MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
+	exports.MAX_VAL = Number.MAX_VALUE;
+	exports.MIN_SAFE_INT = Number.MIN_SAFE_INTEGER;
+	exports.MIN_VAL = Number.MIN_VALUE;
 	exports.makeFalse = function(replacee) {replacee=false;return replacee};
 	exports.makeTrue = function(replacee) {replacee=true;return replacee};
+	exports.NaN = window.NaN || Number.NaN;
 	exports.negate = function(n) {if (IsPositive(n)) {n=-n;return n} else {console.warn("sci.negate: number is already negative: " + n);return n}}
 	exports.negateBeta = function(n) {n=-n};
 	exports.new = function(func) {var arg=func || Object;return new arg};
@@ -635,8 +727,71 @@
 	exports.newArray = function() {return new Array()};
 	exports.newBoolean = function() {return new Boolean()};
 	exports.newDate = function() {return new Date()};
+	exports.newError = function() {return new Error()};
 	exports.newFunction = function() {return new Function()};
 	exports.newObject = function() {return new Object()};
+	exports.newRegExp = function() {return new RegExp()};
+	exports.newString = function() {return new String()};
+	exports.nth = {
+	    evenNumber: function(nth) {return 2*nth},
+	    fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
+	    oddNumber: function(nth) {return nth+(nth-1)}
+    };
+    exports.numberFunctions = {
+        E: function(x){return Math.exp(x)},
+        isEven: function(n){var m=n % 2;if(Number(m)==0){return true}else{return false}},
+        isFinite: function(n){return isFinite(n)},
+        isInfinite: function(n){return (n== -Infinity || n==Infinity)},
+        isInteger: function(n) {return Number.isInteger(n)},
+        isNaN: function(n){return isNaN(n)},
+        isNumber: function(val){
+        	if (isFinite(val)==false) {return false}
+    	    if (isNaN(val)) {return false}
+        },
+        isOdd: function(n){var m=n % 2;if(Number(m)==1){return true}else{return false}},
+        //whole numbers only
+        isPerfectWhole: function(n, exp) {var m=n**(1/exp);return Math.round(m)==m},
+        power2: function(exp){return 2**exp},
+        power10: function(exp){return 10**exp},
+	    random: function(n){if(n==null){return Math.random()}else{return Math.floor(Math.random()*n)}},
+	    round: function(n){return Math.round(n)},
+	    root: {
+		    cube: function(n){return Math.cbrt(n)},
+		    hex: function(n){return Math.sqrt(Math.cbrt(n))},
+		    nth: function(n, denom, numer){if(numer==null){return n**(1/denom)}else{return n**(numer/denom)}},
+		    quad: function(n){return Math.sqrt(Math.sqrt(n))},
+		    square: function(n){return Math.sqrt(n)}
+	    },
+	    sign: function(x){if(x==NaN){return NaN}else{return Math.sign(x)}}
+    };
+    exports.numberValues = {
+    	EPSILON: Number.EPSILON,
+	    e1: 2.71,
+	    e2: 2.71828,
+	    eFull: Math.E,
+	    fracMil: 1 / 1000000,
+	    half: 1 / 2,
+	    infinity: Infinity,
+	    ln2: Math.LN2,
+	    ln10: Math.LN10,
+	    pi1: 3.14,
+	    pi2: 22 / 7,
+	    pi3: 3.1416,
+	    pi4: 3.141592653,
+	    piLongerString: "3.1415926535897932384626433832795028841971693993751058209749"+
+	        "445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019"+
+	        "385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602"+
+	        "491412737245870066063155881748815209209628292540917153643678925"+
+	        "903600113305305488204665213841469519415116094330572703657595919530"+
+	        "9218611738193261179310511854807446237996274956735188575272489122793"+
+	        "818301194912983367336244065664308602139494639522473719070217986"+
+	        "094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872"+
+	        "1468440901224953430146549585371050792279689258923542019956112129021960864034418159813629774771",
+	    piMath: Math.PI,
+	    piOverE: Math.PI / Math.E,
+	    undefined: undefined
+    };
+    exports.objAssign = function(target, src) {Object.assign(target, src);return target};
 	exports.ownCons = function() {return exports};
 	exports.ownConstructorSci = function(obj) {obj.prototype.constructorSci = obj};
 	exports.posate = function(n) {if (IsPositive(n)) {console.warn("sci.posate: number is already positive: " + n);return n} else {n=Math.abs(n);return n}};
@@ -651,6 +806,11 @@
 	    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 	    "-", "_", "$", "&", "#", "@", "?"
 	];
+	exports.regularPolygonGeometry = {
+	    area: function(perimeter, apothem){if(apothem==null){console.error("apothem is not defined")}else{return (perimeter*apothem)/2}},
+	    circumference: function(radius){return 2*r*Math.PI},
+        perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
+    };
 	exports.removeClass = function (sel, name) {
         exports.removeClassElements(getElements(sel), name);
     };
@@ -718,6 +878,27 @@
         ss.start();
         return ss;
     };
+    exports.solveForX = {
+	    //standard forms
+	    linearEquation: function(a, b){return -b / a},
+	    quadraticEquation: function(a, b, c){
+		    var Dis = exports.numberFunctions.root.square(b**2) - (4*a*c);
+		    var Dnm = 2*a;
+		    var s1 = (-b + Dis)/Dnm;
+		    var s2 = (-b - Dis)/Dnm;
+		    return [s1, s2];
+	    }
+    };
+    exports.stringExec = function(patt, str) {return patt.exec(str)};
+    exports.stringIncludes = function(str, sub, pos) {return str.includes(sub, pos)};
+    exports.stringNumber = function(nums) {
+    	var num = "";
+    	for (var i=0; i<nums.length; i++) {num += nums[i]}
+    	return Number(num);
+    };
+    exports.stringReplace = function(str, sub, newstr) {var a = str.replace(sub, newstr);return a};
+    exports.stringSearch = function(str, sub) {return str.search(sub)};
+    exports.stringTest = function(patt, str) {return patt.test(str)};
     exports.summation = function(values, isString) {
     	var count=0; if (isString) {count=""}
     	for (var i=0; i<values.length; i++) {
@@ -726,6 +907,17 @@
     	return count;
     };
 	exports.switchSign = function(n) {n=-n;return n};
+	exports.temperature = {
+	    //fahrenheit
+	    toCelsius: function(fahrenheit){return (5/9)*(fahrenheit-32)},
+	    toDelisle: function(fahrenheit){return (212-fahrenheit)*(5/6)},
+	    toKelvin: function(fahrenheit){return ((5/9)*(fahrenheit-32))+273.15},
+	    toRankine: function(fahrenheit){return fahrenheit+459.67}
+    };
+    exports.temperature.toGasMark = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c-121)/14};
+    exports.temperature.toNewton = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.33};
+    exports.temperature.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
+    exports.temperature.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
 	exports.toggleArrayItem = function(arr, n, val) {
 		var olditem = arr[n], newitem = val;
 		if (arr[n]==olditem) {arr[n]=newitem}
@@ -783,6 +975,14 @@
     	XNOR: [[0, 0], [1, 1]],
     	XOR: [[1, 0], [0, 1]]
     };
+    exports.trigonometry = {
+	    cos: function(radians){return Math.cos(radians)},
+	    pythagoreanTheoremAdjacent: function(opp, hyp){var a=Math.sqrt((hyp**2)-(opp**2));return a;},
+	    pythagoreanTheoremHypotenuse: function(adj, opp){var c=Math.sqrt((adj**2)+(opp**2));return c;},
+	    pythagoreanTheoremOpposite: function(adj, hyp){var b=Math.sqrt((hyp**2)-(adj**2));return b;},
+	    sin: function(radians){return Math.sin(radians)},
+	    tan: function(radians){return Math.tan(radians)}
+    };
     exports.typeOf = function(arg) { //a more specific typeof
     	if (arg===true || arg===false) {return "boolean"}
     	else if (typeof arg === "function") {return "function"}
@@ -796,13 +996,15 @@
 	exports.typeOfBeta=function(arg) {return typeof arg};
 	exports.valOf = function(obj) {var o=obj || exports; return o};
 
+
     //SETUP STUFF
-	var VERSION = "1.0006";
+	var VERSION = "1.0007";
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
 	//using x as the problem (by console.errors)
+    exports.ERR_ERR = "Uncaught Error: x";
 	exports.ERR_LOAD_RESOURCE_FAILED = "Failed to load resource: the server responded with a status of 403 ()";
 	exports.ERR_LOAD_RESOURCE_NETFAILED = "Failed to load resource: net::ERR_FAILED";
 	exports.ERR_NAME_NOT_RESOLVED = "Failed to load resource: net::ERR_NAME_NOT_RESOLVED";
@@ -810,214 +1012,10 @@
 	exports.ERR_REFERENCE_UNDEFINED = "Uncaught ReferenceError: x is not defined";
 	exports.ERR_SYNTAX_UNEXPECTED_IDENTIFIER = "Uncaught SyntaxError: Unexpected identifier";
 	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token x";
+	exports.ERR_THROW = "Uncaught x";
 	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE = "Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be accessed on strict mode functions or the arguments objects for calls to them";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
+	exports.STRICTERR_SYNTAX_UNEXPECTED_EVALORARGS = "Uncaught SyntaxError: Unexpected eval or arguments in strict mode";
+	exports.STRICTERR_SYNTAX_UNQUALIFIED_IDENTIFIER = "Uncaught SyntaxError: Delete of an unqualified identifier in strict mode.";
 	
 }));
-
-
-
-
-/* MATH! */
-var sciMath = {};
-//arithmetic
-sciMath.arithmetic = {
-    bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
-    dec: function(n, dec){if(dec==null){n--}else{n-=dec}},
-    difference: function(a, b){return a-b},
-    inc: function(n, inc){if(inc==null){n++}else{n+=inc}},
-    multiplication: function(val){var x=val.length,count=1;for(var i = 0; i < x; i++){count *= val[i];}return count},
- 	summation: function(val){var x=val.length,count=0;for(var i = 0; i < x; i++){count += val[i];}return count}
-};
-
-
-//data
-sciMath.data = {
- 	max: function(val){return Math.max(val)},
- 	mean: function(val){var x = val.length,count = 0;for(var i = 0; i < x; i++){count += val[i];}return count/x;},
- 	//for the median, values can now be unorganized:
- 	median: function(val){
- 		if (sciMath.numberFunctions.isEven(val.length)) {var x=val.sort();return (x[((x.length + 2)/2)-2]+x[((x.length + 2)/2)-1])/2}
- 		else {var x=val.sort();return x[((x.length + 1)/2)-1]}
- 	},
- 	min: function(val){return Math.min(val)},
- 	mode: function(arr){return arr.reduce(function(current, item){var val=current.numMapping[item]=(current.numMapping[item]||0)+1;
-        if(val>current.greatestFreq){current.greatestFreq=val;current.mode=item;}return current;},
-        {mode:null,greatestFreq:-Infinity,numMapping:{}}).mode;
-    },
- 	range: function(val){return Math.max(val)-Math.min(val)}
-};
-sciMath.data.meanDeviation = function(values){var avg=sciMath.mean(values);var squareDiffs=values.map(function(value){var diff=value-avg;return diff;});
-    var avgSquareDiff=sciMath.mean(squareDiffs);return avgSquareDiff;
-};
-sciMath.data.standardDeviation = function(values){var avg=sciMath.mean(values);var squareDiffs=values.map(function(value){var diff=value-avg;
-    var sqrDiff=diff*diff;return sqrDiff;});var avgSquareDiff=sciMath.mean(squareDiffs);var stdDev = Math.sqrt(avgSquareDiff);return stdDev;
-};
-sciMath.data.variance = function(values){var sd=sciMath.data.standardDeviation(values);return sd**2;};
-
-//geometry (moar)
-sciMath.geometry = {
-	area: {
-		annulus: function(r1, r2) {return Math.PI*(r1-r2)},
-		circle: function(r) {return Math.PI*(r*r)},
-		circleLog: function(c, d) {return c*d/4},
-		rectangle: function(l, w) {return l*w},
-		rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
-		square: function(s) {return s*s},
-		trapezium: function(a, c, h) {return h*((a+c)/2)},
-		triangle: function(b, h) {return (b*h)/2}
-	},
-	perimeter: {
-		rectangle: function(l, w) {return 2*(l+w)},
-		square: function(s) {return s*4},
-		trapezium: function(a, b, c, d) {
-			var e = a || 1;
-			var f = b || e;
-			var g = c || f;
-			var h = d || g;
-			return e+f+g+h;
-		},
-		triangle: function(a, b, c) {
-			var d = a || 1;
-			var e = b || d;
-			var f = c || e;
-			return d+e+f;
-		}
-	},
-	tsa: {
-		cube: function(s) {return 6*(s*s)},
-		cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
-		cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
-		sphere: function(r) {return 4*Math.PI*(r**2)},
-		tube: function(h, r1, r2) {
-			var a = r1**2, b = r2**2, p = 2*Math.PI;
-			return p*((a-b)+(h*(a+b)));
-		}
-	},
-	volume: {
-		cone: function(r, h) {var a=Math.PI*(1/3),b=r*r*h;return a*b},
-		cube: function(s) {return s**3},
-		cuboid: function(l, w, h) {return l*w*h},
-		cylinder: function(r, h) {return Math.PI*(r*r)*h},
-		sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b}
-	}
-};
-
-//logarithm
-sciMath.logarithm = {
-	LOG2: function(n){return Math.log2(n)},
-	log: function(n){return Math.log(n)}
-};
-
-//nth
-sciMath.nth = {
-	evenNumber: function(nth) {return 2*nth},
-	fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
-	oddNumber: function(nth) {return nth+(nth-1)}
-};
-
-//numFuncs
-sciMath.numberFunctions = {
-    e: function(num, eval){return JSON.parse(num + "e" + eval)},
-    E: function(x){return Math.exp(x)},
-    isEven: function(n){var m=n % 2;if(Number(m)==0){return true}else{return false}},
-    isFinite: function(n){return isFinite(n)},
-    isInfinite: function(n){return (n== -Infinity || n==Infinity)},
-    isNaN: function(n){return isNaN(n)},
-    isNumber: function(val){
-    	if (isFinite(val)==false) {return false}
-    	if (isNaN(val)) {return false}
-    },
-    isOdd: function(n){var m=n % 2;if(Number(m)==1){return true}else{return false}},
-    //whole numbers only
-    isPerfect: function(n, exp) {var m=n**(1/exp);return Math.round(m)==m},
-    power2: function(exp){return 2**exp},
-    power10: function(exp){return 10**exp},
-	random: function(n){if(n==null){return Math.random()}else{return Math.floor(Math.random()*n)}},
-	round: function(n){return Math.round(n)},
-	root: {
-		cube: function(n){return Math.cbrt(n)},
-		hex: function(n){return Math.sqrt(Math.cbrt(n))},
-		nth: function(n, denom, numer){if(numer==null){return n**(1/denom)}else{return n**(numer/denom)}},
-		quad: function(n){return Math.sqrt(Math.sqrt(n))},
-		square: function(n){return Math.sqrt(n)}
-	},
-	sign: function(x){if(x==NaN){return NaN}else{return Math.sign(x)}}
-};
-
-
-//numbers
-sciMath.numberValues = {
-	e1: 2.71,
-	e2: 2.71828,
-	eFull: Math.E,
-	fracMil: 1 / 1000000,
-	half: 1 / 2,
-	infinity: Infinity,
-	ln2: Math.LN2,
-	ln10: Math.LN10,
-	pi1: 3.14,
-	pi2: 22 / 7,
-	pi3: 3.1416,
-	pi4: 3.141592653,
-	piFullString: "3.1415926535897932384626433832795028841971693993751058209749"+
-	    "445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019"+
-	    "385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602"+
-	    "491412737245870066063155881748815209209628292540917153643678925"+
-	    "903600113305305488204665213841469519415116094330572703657595919530"+
-	    "9218611738193261179310511854807446237996274956735188575272489122793"+
-	    "818301194912983367336244065664308602139494639522473719070217986"+
-	    "094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872"+
-	    "1468440901224953430146549585371050792279689258923542019956112129021960864034418159813629774771",
-	piMath: Math.PI,
-	piOverE: Math.PI / Math.E,
-	undefined: undefined
-};
-
-//geometry (regular)
-sciMath.regularGeometry = {
-	//regular polygons only
-	area: function(perimeter, apothem){if(apothem==null){console.error("apothem is not defined")}else{return (perimeter*apothem)/2}},
-	circumference: function(radius){return 2*r*Math.PI},
-    perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
-};
-
-//x
-sciMath.solveForX = {
-	//standard forms
-	linearEquation: function(a, b){return -b / a},
-	quadraticEquation: function(a, b, c){
-		var Dis = sciMath.numberFunctions.root.square(b**2) - (4*a*c);
-		var Dnm = 2*a;
-		var s1 = (-b + Dis)/Dnm;
-		var s2 = (-b - Dis)/Dnm;
-		return [s1, s2];
-	}
-};
-
-//temp
-sciMath.temperature = {
-	//fahrenheit
-	toCelsius: function(fahrenheit){return (5/9)*(fahrenheit-32)},
-	toDelisle: function(fahrenheit){return (212-fahrenheit)*(5/6)},
-	toKelvin: function(fahrenheit){return ((5/9)*(fahrenheit-32))+273.15},
-	toRankine: function(fahrenheit){return fahrenheit+459.67}
-};
-sciMath.temperature.toGasMark = function(fahrenheit){var c=sciMath.temperature.toCelsius(fahrenheit);return (c-121)/14};
-sciMath.temperature.toNewton = function(fahrenheit){var c=sciMath.temperature.toCelsius(fahrenheit);return c*0.33};
-sciMath.temperature.toReaumur = function(fahrenheit){var c=sciMath.temperature.toCelsius(fahrenheit);return c*0.8};
-sciMath.temperature.toRomer = function(fahrenheit){var c=sciMath.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
-
-//trig
-sciMath.trigonometry = {
-	cos: function(radians){return Math.cos(radians)},
-	pythagoreanTheoremAdjacent: function(opp, hyp){var a=Math.sqrt((hyp**2)-(opp**2));return a;},
-	pythagoreanTheoremHypotenuse: function(adj, opp){var c=Math.sqrt((adj**2)+(opp**2));return c;},
-	pythagoreanTheoremOpposite: function(adj, hyp){var b=Math.sqrt((hyp**2)-(adj**2));return b;},
-	sin: function(radians){return Math.sin(radians)},
-	tan: function(radians){return Math.tan(radians)}
-};
-
-//misc
-sciMath.other = {
-};

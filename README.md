@@ -5,6 +5,15 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0009
+- added jsonFromServerBeta
+- added geometry: tube, lunarCrescent, torus, ellipse and ellipsoids
+- removed geometry tube extra comma (because there wasn't any additions yet)
+- added more math (otherMath) for real-life situations! :)
+- added factorial (for some math formulas)
+- turned sci into a greeting alert function
+- added the very first conversion formula: inchToCm (possible to reverse by putting "true" in place of rev)
+
 ### v1.0008
 - added whatConstructor()
 - fixed a few errors

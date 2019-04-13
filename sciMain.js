@@ -9,7 +9,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.sci = {}));
+	(global = global || self, factory(global.sci = function() {alert("THANK YOU FOR USING sciMain.js, YOU MAY NOW PROCEED.")}));
 }(this, function (exports) {'use strict';
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)
@@ -598,6 +598,11 @@
 	exports.color.rgbToHex = function(r, g, b) {
 		return "#" + exports.color.componentToHex(r) + exports.color.componentToHex(g) + exports.color.componentToHex(b);
     };
+    exports.createButton = function(html) {
+    	var btn = document.createElement("BUTTON");
+    	btn.innerHTML = html;
+    	return btn;
+    };
     exports.createP = function(txt) {
     	var a = document.createElement("P");
     	a.innerText = txt;
@@ -629,6 +634,13 @@
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
 	exports.ErrorStackTraceLimit = Error.stackTraceLimit;
+	exports.factorial = function(n) {
+		if (n==0) {return 1}
+		if (n<0) {console.error("sci.factorial: unexpected Math error");return undefined}
+		var count = 1;
+		for (i=0; i<n+1; i++) {count *= i}
+		return count;
+	};
 	exports.generateRandomArray = function(len, replacee, items) {
 		var arr = replacee || [];
 		var tems = items || exports.randomSciIDVars;
@@ -668,6 +680,8 @@
 	    	annulus: function(r1, r2) {return Math.PI*(r1-r2)},
 	    	circle: function(r) {return Math.PI*(r*r)},
 		    circleLog: function(c, d) {return c*d/4},
+		    ellipse: function(a, b) {return (Math.PI)*a*b},
+		    lunarCrescent: function(c, d) {return (1/4)*Math.PI*c*d},
 		    rectangle: function(l, w) {return l*w},
 		    rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
 		    square: function(s) {return s*s},
@@ -696,6 +710,10 @@
 		    cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
 		    cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
 		    sphere: function(r) {return 4*Math.PI*(r**2)},
+		    torus: function (r, R) {
+		    	var p = Math.PI**2;
+		    	return 4*p*R*r*r;
+		    },
 		    tube: function(h, r1, r2) {
 		    	var a = r1**2, b = r2**2, p = 2*Math.PI;
 			    return p*((a-b)+(h*(a+b)));
@@ -706,7 +724,18 @@
 		    cube: function(s) {return s**3},
 		    cuboid: function(l, w, h) {return l*w*h},
 		    cylinder: function(r, h) {return Math.PI*(r*r)*h},
-		    sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b}
+		    ellipsoid: function(a, b, c) {return (4/3)*Math.PI*a*b*c},
+		    ellipsoidOblate: function(a, b) {return (4/3)*Math.PI*a*a*b},
+		    ellipsoidProlate: function(a, b) {return (4/3)*Math.PI*a*b*b},
+		    sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b},
+		    torus: function(r, R) {
+		    	var p = Math.PI**2;
+		    	return 2*p*R*r*r;
+		    },
+		    tube: function(h, r1, r2) {
+		    	var a = 2*r1*Math.PI*h, b = 2*r2*Math.PI*h;
+		    	return a-b;
+		    }
 	    }
     };
 	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
@@ -740,6 +769,19 @@
 	exports.IsString = function(arg) {return typeof arg === "string"};
 	exports.IsTrue = function(bool) {return bool===true};
 	exports.IsUndefinedByTypeof = function(arg) {return typeof arg === "undefined"};
+	exports.jsonFromServerBeta = function(method, file, async, str) {
+		if (async === undefined) {async=true}
+		if (file === undefined) {console.error("sci.jsonFromServerBeta: file is not defined");return;}
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var myObj = JSON.parse(this.responseText);
+				return myObj;
+			}
+		};
+		xmlhttp.open(method, file, async);
+		if (str !== undefined) {xmlhttp.send(str);} else {xmlhttp.send();}
+	};
 	exports.logAllVariables = function() {for(var b in window){if(window.hasOwnProperty(b)){console.log(b)}}};
 	exports.logarithm = {
 	    LOG2: function(n){return Math.log2(n)},
@@ -1035,7 +1077,7 @@
 
 
     //SETUP STUFF
-	var VERSION = "1.0008";
+	var VERSION = "1.0009";
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;
@@ -1056,3 +1098,18 @@
 	exports.STRICTERR_SYNTAX_UNQUALIFIED_IDENTIFIER = "Uncaught SyntaxError: Delete of an unqualified identifier in strict mode.";
 	
 }));
+
+//otherMath
+sci.otherMath = { //realities?
+	acceleration: function(s, t) {return s/t},
+    angleDegreesBetweenTwoClockHands: function(m, h) {return (5.5*m)-(30*h)}, //degrees
+    cardsForCardHouse: function(layers) {var a=(3*layers)+1;var b=layers*a;return b/2},
+    density: function(mass, volume) {return mass/volume},
+    dominoOrientations: function(dominoes, doubles) {var n=dominoes;var f=exports.factorial(n);var m=2**(n-doubles);return m*f;},
+    highestAmountNotPossible: function(x, y) {return (x*y)-x-y},
+    maxRangeOfCannonAt45deg: function(v, g) {return (v*v)/g},
+    noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)}
+};
+
+//conversions
+sci.inchToCm: function(n, rev) {if (rev) {return n/2.54} else {return 2.54*n}};

@@ -1112,4 +1112,4 @@ sci.otherMath = { //realities?
 };
 
 //conversions
-sci.inchToCm: function(n, rev) {if (rev) {return n/2.54} else {return 2.54*n}};
+sci.inchToCm = function(n, rev) {if (rev) {return n/2.54} else {return 2.54*n}};

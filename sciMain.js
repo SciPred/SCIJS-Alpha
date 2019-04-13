@@ -569,6 +569,40 @@
 	exports.clearConsole = function() {console.clear()};
 	exports.click = function(btn) {btn.click()};
 	exports.close = function() {document.close()};
+	exports.color = {
+		componentToHex: function(c) {var hex = c.toString(16);return hex.length == 1 ? "0" + hex : hex;},
+		hexScalar: function(s, is3) {if (is3) {return "#"+s+s+s} else {return "#"+s+s+s+s+s+s}},
+		hexToRgbBeta: function(hex) {
+			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+			return result ? {
+				r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+		},
+		hexToRgb: function(hex) {
+			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+            var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+                return r + r + g + g + b + b;
+            });
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+		},
+		rgbToHexAlt: function(r, g, b) {return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);}
+	};
+	exports.color.rgbToHex = function(r, g, b) {
+		return "#" + exports.color.componentToHex(r) + exports.color.componentToHex(g) + exports.color.componentToHex(b);
+    };
+    exports.createP = function(txt) {
+    	var a = document.createElement("P");
+    	a.innerText = txt;
+    	return a;
+    };
 	exports.data = {
      	max: function(val){return Math.max(val)},
      	mean: function(val){var x = val.length,count = 0;for(var i = 0; i < x; i++){count += val[i];}return count/x;},
@@ -840,6 +874,7 @@
 	    return arr;
 	};
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
+	exports.rot3d = function(elm, x, y, z, angle) {elm.style.transform = "rotate3d("+x+","+y+","+z+","+angle+")"};
 	exports.sign = function(n) {
 		if (n<0) {return -1}
 		else if (n==0 || n==false)  {return 0}
@@ -975,6 +1010,7 @@
     	XNOR: [[0, 0], [1, 1]],
     	XOR: [[1, 0], [0, 1]]
     };
+    exports.trans3d = function(elm, x, y, z) {elm.style.transform = translate3d(x, y, z)};
     exports.trigonometry = {
 	    cos: function(radians){return Math.cos(radians)},
 	    pythagoreanTheoremAdjacent: function(opp, hyp){var a=Math.sqrt((hyp**2)-(opp**2));return a;},
@@ -995,10 +1031,11 @@
     };
 	exports.typeOfBeta=function(arg) {return typeof arg};
 	exports.valOf = function(obj) {var o=obj || exports; return o};
+	exports.whatConstructor = function(arg) {return arg.constructor};
 
 
     //SETUP STUFF
-	var VERSION = "1.0007";
+	var VERSION = "1.0008";
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;

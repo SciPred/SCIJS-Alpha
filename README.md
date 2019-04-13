@@ -5,6 +5,11 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0008
+- added whatConstructor()
+- fixed a few errors
+- added color functions
+
 ### v1.0007
 - converted sciMath to part of sci (i.e. sciMath.data => sci.data)
 - changed isPerfect to isPerfectWhole

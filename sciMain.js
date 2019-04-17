@@ -11,6 +11,7 @@
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function() {alert("THANK YOU FOR USING sciMain.js, YOU MAY NOW PROCEED.")}));
 }(this, function (exports) {'use strict';
+	var VERSION = "1.0010";
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)
 	if ( Math.sign === undefined ) {
@@ -50,6 +51,10 @@
 				return output;
 			};
 		} )();
+	}
+	//CUSTOM POLYFILLS
+	if (exports.prototype.__VERSION__ === undefined) {
+		exports.prototype.__VERSION__ = VERSION;
 	}
 	//FUNCTIONS (sure nuff any function with // end is exported from bottom)
 	function addClass(elm, cls) {elm.classList.add(cls)}//
@@ -552,11 +557,13 @@
 
 	/* actuals (totally my own ideas) */
 	//FUNCTIONS
+	exports.abs = function(n) {return Math.abs(n)};
 	exports.addClass = function (sel, name) {exports.addClassElements(getElements(sel), name)};
 	exports.addClassElement = function (element, name) {var i, arr1, arr2;arr1 = element.className.split(" ");arr2 = name.split(" ");
         for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
     };
     exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
+    exports.args = function(arg) {return arg.arguments};
     exports.arithmetic = {
         bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
         dec: function(n, dec){if(dec==null){n--}else{n-=dec}},
@@ -565,10 +572,12 @@
         multiplication: function(val){var x=val.length,count=1;for(var i = 0; i < x; i++){count *= val[i];}return count},
  	    summation: function(val){var x=val.length,count=0;for(var i = 0; i < x; i++){count += val[i];}return count}
     };
+    exports.ceil = function(n) {return Math.ceil(n)};
     exports.choose = function(arr) {return arr[Math.floor(Math.random()*arr.length)]};
 	exports.clearConsole = function() {console.clear()};
 	exports.click = function(btn) {btn.click()};
 	exports.close = function() {document.close()};
+	exports.clz32 = function(x) {return Math.clz32(x)};
 	exports.color = {
 		componentToHex: function(c) {var hex = c.toString(16);return hex.length == 1 ? "0" + hex : hex;},
 		hexScalar: function(s, is3) {if (is3) {return "#"+s+s+s} else {return "#"+s+s+s+s+s+s}},
@@ -633,7 +642,14 @@
 	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
+	exports.E = function(x){return Math.exp(x)};
+	exports.EPSILON = Number.EPSILON;
 	exports.ErrorStackTraceLimit = Error.stackTraceLimit;
+	exports.eMath = Math.E;
+	exports.exp = function(n) {return Math.exp(n)};
+	exports.expm1 = function(n) {return Math.expm1(n)};
+	exports.e1 = 2.71;
+	exports.e2 = 2.71828;
 	exports.factorial = function(n) {
 		if (n==0) {return 1}
 		if (n<0) {console.error("sci.factorial: unexpected Math error");return undefined}
@@ -641,6 +657,8 @@
 		for (i=0; i<n+1; i++) {count *= i}
 		return count;
 	};
+	exports.floor = function(n) {return Math.floor(n)};
+	exports.fround = function(n) {return Math.fround(n)};
 	exports.generateRandomArray = function(len, replacee, items) {
 		var arr = replacee || [];
 		var tems = items || exports.randomSciIDVars;
@@ -756,19 +774,24 @@
 		normal: function(id) {return getElements(id)},
 		warning: function() {console.warn("sci.getSingleElement: Please note that the id must not be specific (i.e. only id, not document.getElementById(id)).")}
 	});
+	exports.half = 1/2 || 0.5;
 	exports.hasConsole = function() {return typeof console !== "undefined"};
 	exports.hasDocumentBody = function() {return document.body !== undefined};
 	exports.hasWebWorker = function() {return typeof Worker !== undefined};
+	exports.Infinity = Infinity;
 	exports.IsBinaricBoolean = function(arg) {return (arg==0 || arg==1)};
 	exports.IsBoolean = function(arg) {return typeof arg === "boolean"};
 	exports.IsEqualStyle = function(elm1style, elm2style) {return elm1style===elm2style};
 	exports.IsFalse = function(bool) {return bool===false};
 	exports.IsFunction = function(arg) {return typeof arg === "function"};
+	exports.IsInteger = function(n) {return Number.isInteger(n)};
 	exports.IsObject = function(arg) {return typeof arg === "object"};
+	exports.IsPerfectWhole = function(n, exp) {var m=n**(1/exp);return Math.round(m)==m};
 	exports.IsSafeInteger = function(int) {return Number.isSafeInteger(int)};
 	exports.IsString = function(arg) {return typeof arg === "string"};
 	exports.IsTrue = function(bool) {return bool===true};
 	exports.IsUndefinedByTypeof = function(arg) {return typeof arg === "undefined"};
+	exports.imul = function(x, y) {return Math.imul(x, y)};
 	exports.jsonFromServerBeta = function(method, file, async, str) {
 		if (async === undefined) {async=true}
 		if (file === undefined) {console.error("sci.jsonFromServerBeta: file is not defined");return;}
@@ -782,17 +805,22 @@
 		xmlhttp.open(method, file, async);
 		if (str !== undefined) {xmlhttp.send(str);} else {xmlhttp.send();}
 	};
+	exports.LN10 = Math.LN10;
+	exports.LN2 = Math.LN2;
+	exports.LOG1p = function(n) {return Math.log1p(n)};
+	exports.LOG10 = function(n) {return Math.log10(n)};
+	exports.LOG10E = Math.LOG10E;
+	exports.LOG2 = function(n){return Math.log2(n)};
+	exports.LOG2E = Math.LOG2E;
+	exports.log = function(n, b){return Math.log(n, b)};
 	exports.logAllVariables = function() {for(var b in window){if(window.hasOwnProperty(b)){console.log(b)}}};
-	exports.logarithm = {
-	    LOG2: function(n){return Math.log2(n)},
-	    log: function(n){return Math.log(n)}
-    };
 	exports.MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
 	exports.MAX_VAL = Number.MAX_VALUE;
 	exports.MIN_SAFE_INT = Number.MIN_SAFE_INTEGER;
 	exports.MIN_VAL = Number.MIN_VALUE;
 	exports.makeFalse = function(replacee) {replacee=false;return replacee};
 	exports.makeTrue = function(replacee) {replacee=true;return replacee};
+	exports.NEGATIVE_INFINITY = -Infinity;
 	exports.NaN = window.NaN || Number.NaN;
 	exports.negate = function(n) {if (IsPositive(n)) {n=-n;return n} else {console.warn("sci.negate: number is already negative: " + n);return n}}
 	exports.negateBeta = function(n) {n=-n};
@@ -813,67 +841,37 @@
 	    fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
 	    oddNumber: function(nth) {return nth+(nth-1)}
     };
-    exports.numberFunctions = {
-        E: function(x){return Math.exp(x)},
-        isEven: function(n){var m=n % 2;if(Number(m)==0){return true}else{return false}},
-        isFinite: function(n){return isFinite(n)},
-        isInfinite: function(n){return (n== -Infinity || n==Infinity)},
-        isInteger: function(n) {return Number.isInteger(n)},
-        isNaN: function(n){return isNaN(n)},
-        isNumber: function(val){
-        	if (isFinite(val)==false) {return false}
-    	    if (isNaN(val)) {return false}
-        },
-        isOdd: function(n){var m=n % 2;if(Number(m)==1){return true}else{return false}},
-        //whole numbers only
-        isPerfectWhole: function(n, exp) {var m=n**(1/exp);return Math.round(m)==m},
-        power2: function(exp){return 2**exp},
-        power10: function(exp){return 10**exp},
-	    random: function(n){if(n==null){return Math.random()}else{return Math.floor(Math.random()*n)}},
-	    round: function(n){return Math.round(n)},
-	    root: {
-		    cube: function(n){return Math.cbrt(n)},
-		    hex: function(n){return Math.sqrt(Math.cbrt(n))},
-		    nth: function(n, denom, numer){if(numer==null){return n**(1/denom)}else{return n**(numer/denom)}},
-		    quad: function(n){return Math.sqrt(Math.sqrt(n))},
-		    square: function(n){return Math.sqrt(n)}
-	    },
-	    sign: function(x){if(x==NaN){return NaN}else{return Math.sign(x)}}
-    };
-    exports.numberValues = {
-    	EPSILON: Number.EPSILON,
-	    e1: 2.71,
-	    e2: 2.71828,
-	    eFull: Math.E,
-	    fracMil: 1 / 1000000,
-	    half: 1 / 2,
-	    infinity: Infinity,
-	    ln2: Math.LN2,
-	    ln10: Math.LN10,
-	    pi1: 3.14,
-	    pi2: 22 / 7,
-	    pi3: 3.1416,
-	    pi4: 3.141592653,
-	    piLongerString: "3.1415926535897932384626433832795028841971693993751058209749"+
-	        "445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019"+
-	        "385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602"+
-	        "491412737245870066063155881748815209209628292540917153643678925"+
-	        "903600113305305488204665213841469519415116094330572703657595919530"+
-	        "9218611738193261179310511854807446237996274956735188575272489122793"+
-	        "818301194912983367336244065664308602139494639522473719070217986"+
-	        "094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872"+
-	        "1468440901224953430146549585371050792279689258923542019956112129021960864034418159813629774771",
-	    piMath: Math.PI,
-	    piOverE: Math.PI / Math.E,
-	    undefined: undefined
-    };
     exports.objAssign = function(target, src) {Object.assign(target, src);return target};
+    exports.objFreeze = function(obj, x) {obj.freeze(x);return obj};
+    exports.objIs = function(obj, v1, v2) {return obj.is(v1, v2)};
 	exports.ownCons = function() {return exports};
 	exports.ownConstructorSci = function(obj) {obj.prototype.constructorSci = obj};
+	exports.POSITIVE_INFINITY = exports.Infinity || Infinity;
+	exports.parseFloat = function(str) {return Number.parseFloat(str)};
+	exports.parseInt = function(str, radix) {return Number.parseInt(str, radix)};
+	exports.piFrac = 22/7;
+	exports.piLongerString = "3.1415926535897932384626433832795028841971693993751058209749"+
+	    "445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019"+
+	    "385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602"+
+        "491412737245870066063155881748815209209628292540917153643678925"+
+        "903600113305305488204665213841469519415116094330572703657595919530"+
+        "9218611738193261179310511854807446237996274956735188575272489122793"+
+        "818301194912983367336244065664308602139494639522473719070217986"+
+        "094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872"+
+        "1468440901224953430146549585371050792279689258923542019956112129021960864034418159813629774771";
+	exports.piMath = Math.PI;
+	exports.piOverE = Math.PI / Math.E;
+	exports.pi1 = 3.14;
+	exports.pi2 = 3.1416;
+	exports.pi3 = 3.141592653;
 	exports.posate = function(n) {if (IsPositive(n)) {console.warn("sci.posate: number is already positive: " + n);return n} else {n=Math.abs(n);return n}};
 	Object.assign(exports.posate, {
 		warning: function() {console.warn("sci.posate: Please note that the function used is n=Math.abs(n), not n=-n.")}
 	});
+	exports.pow = function(x, y) {return Math.pow(x, y)};
+	exports.power10 = function(exp) {return 10**exp};
+	exports.power2 = function(exp) {return 2**exp};
+	exports.random = function(n){if(n==null){return Math.random()}else{return Math.floor(Math.random()*n)}};
 	exports.randomSciIDVars = [
 	    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 	    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
@@ -882,7 +880,7 @@
 	    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 	    "-", "_", "$", "&", "#", "@", "?"
 	];
-	exports.regularPolygonGeometry = {
+	exports.regPolGeometry = {
 	    area: function(perimeter, apothem){if(apothem==null){console.error("apothem is not defined")}else{return (perimeter*apothem)/2}},
 	    circumference: function(radius){return 2*r*Math.PI},
         perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
@@ -916,7 +914,17 @@
 	    return arr;
 	};
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
+	exports.root = {
+		cube: function(n){return Math.cbrt(n)},
+		hex: function(n){return Math.sqrt(Math.cbrt(n))},
+		nth: function(n, denom, numer){if(numer==null){return n**(1/denom)}else{return n**(numer/denom)}},
+		quad: function(n){return Math.sqrt(Math.sqrt(n))},
+		square: function(n){return Math.sqrt(n)}
+	};
 	exports.rot3d = function(elm, x, y, z, angle) {elm.style.transform = "rotate3d("+x+","+y+","+z+","+angle+")"};
+	exports.round = function(n){return Math.round(n)};
+	exports.SQRT1_2 = Math.SQRT1_2;
+	exports.SQRT2 = Math.SQRT2;
 	exports.sign = function(n) {
 		if (n<0) {return -1}
 		else if (n==0 || n==false)  {return 0}
@@ -924,6 +932,7 @@
 		else if (n===undefined) {return undefined}
 		else {return NaN}
 	};
+    exports.signMath = function(x){if(x==NaN){return NaN}else{return Math.sign(x)}};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
         if (!isNaN(ms) || ms == 0) {
             ss.milliseconds = ms;
@@ -984,17 +993,19 @@
     	return count;
     };
 	exports.switchSign = function(n) {n=-n;return n};
-	exports.temperature = {
+	exports.ToLocaleString = function(arg) {return arg.toLocaleString()};
+	exports.ToString = function(arg) {return arg.toString()};
+	exports.temp = {
 	    //fahrenheit
 	    toCelsius: function(fahrenheit){return (5/9)*(fahrenheit-32)},
 	    toDelisle: function(fahrenheit){return (212-fahrenheit)*(5/6)},
 	    toKelvin: function(fahrenheit){return ((5/9)*(fahrenheit-32))+273.15},
 	    toRankine: function(fahrenheit){return fahrenheit+459.67}
     };
-    exports.temperature.toGasMark = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c-121)/14};
-    exports.temperature.toNewton = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.33};
-    exports.temperature.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
-    exports.temperature.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
+    exports.temp.toGasMark = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c-121)/14};
+    exports.temp.toNewton = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.33};
+    exports.temp.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
+    exports.temp.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
 	exports.toggleArrayItem = function(arr, n, val) {
 		var olditem = arr[n], newitem = val;
 		if (arr[n]==olditem) {arr[n]=newitem}
@@ -1053,14 +1064,18 @@
     	XOR: [[1, 0], [0, 1]]
     };
     exports.trans3d = function(elm, x, y, z) {elm.style.transform = translate3d(x, y, z)};
-    exports.trigonometry = {
+    exports.trig = {
 	    cos: function(radians){return Math.cos(radians)},
+	    cosh: function(radians){return Math.cosh(radians)},
 	    pythagoreanTheoremAdjacent: function(opp, hyp){var a=Math.sqrt((hyp**2)-(opp**2));return a;},
 	    pythagoreanTheoremHypotenuse: function(adj, opp){var c=Math.sqrt((adj**2)+(opp**2));return c;},
 	    pythagoreanTheoremOpposite: function(adj, hyp){var b=Math.sqrt((hyp**2)-(adj**2));return b;},
 	    sin: function(radians){return Math.sin(radians)},
-	    tan: function(radians){return Math.tan(radians)}
+	    sinh: function(radians){return Math.sinh(radians)},
+	    tan: function(radians){return Math.tan(radians)},
+	    tanh: function(radians){return Math.tanh(radians)}
     };
+    exports.trunc = function(x) {return Math.trunc(x)};
     exports.typeOf = function(arg) { //a more specific typeof
     	if (arg===true || arg===false) {return "boolean"}
     	else if (typeof arg === "function") {return "function"}
@@ -1072,16 +1087,30 @@
     	else {return "undefined"}
     };
 	exports.typeOfBeta=function(arg) {return typeof arg};
+	exports.undefined = undefined;
 	exports.valOf = function(obj) {var o=obj || exports; return o};
 	exports.whatConstructor = function(arg) {return arg.constructor};
 
 
     //SETUP STUFF
-	var VERSION = "1.0009";
 	exports.constructor = exports;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_SCI = true;
+	exports.__VERSION__ = exports.prototype.__VERSION__ || VERSION;
 	if (typeof console !== "undefined") {console.log("SciPred\'s JS " + VERSION)} //info
+	setInterval(setSSS, 1);
+	function setSSS() {
+		exports.$1 = RegExp.$1;
+		exports.$2 = RegExp.$2;
+		exports.$3 = RegExp.$3;
+		exports.$4 = RegExp.$4;
+		exports.$5 = RegExp.$5;
+		exports.$6 = RegExp.$6;
+		exports.$7 = RegExp.$7;
+		exports.$8 = RegExp.$8;
+		exports.$9 = RegExp.$9;
+		exports.$_ = RegExp.$_;
+	}
 	//using x as the problem (by console.errors)
     exports.ERR_ERR = "Uncaught Error: x";
 	exports.ERR_LOAD_RESOURCE_FAILED = "Failed to load resource: the server responded with a status of 403 ()";
@@ -1094,6 +1123,7 @@
 	exports.ERR_THROW = "Uncaught x";
 	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE = "Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be accessed on strict mode functions or the arguments objects for calls to them";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
+	exports.ERR_TYPE_NUM_UNCREATABLE_PROP = "Uncaught TypeError: Cannot create property x on number y";
 	exports.STRICTERR_SYNTAX_UNEXPECTED_EVALORARGS = "Uncaught SyntaxError: Unexpected eval or arguments in strict mode";
 	exports.STRICTERR_SYNTAX_UNQUALIFIED_IDENTIFIER = "Uncaught SyntaxError: Delete of an unqualified identifier in strict mode.";
 	
@@ -1104,12 +1134,15 @@ sci.otherMath = { //realities?
 	acceleration: function(s, t) {return s/t},
     angleDegreesBetweenTwoClockHands: function(m, h) {return (5.5*m)-(30*h)}, //degrees
     cardsForCardHouse: function(layers) {var a=(3*layers)+1;var b=layers*a;return b/2},
+    combination: function(n, r) {
+    	var a = sci.factorial(n), b = sci.factorial(r);
+    	var c = (a)/(b*sci.factorial(n-r));return c;
+    },
     density: function(mass, volume) {return mass/volume},
     dominoOrientations: function(dominoes, doubles) {var n=dominoes;var f=exports.factorial(n);var m=2**(n-doubles);return m*f;},
+    gravityHunDigit: 9.81,
+    gravityRounded: 10,
     highestAmountNotPossible: function(x, y) {return (x*y)-x-y},
     maxRangeOfCannonAt45deg: function(v, g) {return (v*v)/g},
     noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)}
 };
-
-//conversions
-sci.inchToCm = function(n, rev) {if (rev) {return n/2.54} else {return 2.54*n}};

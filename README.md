@@ -5,6 +5,17 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0010
+- scattered some sci math functions and values
+- added more Math numbers
+- more Math functions, however numberValues and numberFunctions are no more
+- added objFreeze and objIs
+- added Infinity variables
+- added new ERR_TYPE variable
+- now possible to see the version itself (__VERSION__)
+- added $-vars from RegExp (always updating via setInterval)
+- added args
+
 ### v1.0009
 - added jsonFromServerBeta
 - added geometry: tube, lunarCrescent, torus, ellipse and ellipsoids

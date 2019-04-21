@@ -11,7 +11,7 @@
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function() {alert("THANK YOU FOR USING sciMain.js, YOU MAY NOW PROCEED.")}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0010";
+	var VERSION = "1.0011";
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)
 	if ( Math.sign === undefined ) {
@@ -557,12 +557,14 @@
 
 	/* actuals (totally my own ideas) */
 	//FUNCTIONS
+	exports.AND = function(a, b) {return a & b};
 	exports.abs = function(n) {return Math.abs(n)};
 	exports.addClass = function (sel, name) {exports.addClassElements(getElements(sel), name)};
 	exports.addClassElement = function (element, name) {var i, arr1, arr2;arr1 = element.className.split(" ");arr2 = name.split(" ");
         for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
     };
     exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
+    exports.addItemToEnd = function(arr, item) {arr[arr.length+1] = item;return arr};
     exports.args = function(arg) {return arg.arguments};
     exports.arithmetic = {
         bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
@@ -667,6 +669,18 @@
 		}
 		if (replacee !== undefined) {replacee = arr;return replacee} else {return arr}
 	};
+	exports.generateRandomHex = function(rands, isScalar) {
+		var hex = "#", clr = rands || exports.randomHexVars;
+		var rnd;
+		if (isScalar) {
+			rnd = exports.choose(clr);
+			hex += rnd + rnd + rnd + rnd + rnd + rnd;
+			return hex;
+		} else {
+			for (var i=0; i<6; i++) {hex += exports.choose(clr);}
+			return hex;
+		}
+	};
 	exports.generateRandomNumber = function(len, replacee, rands) {
 		var num = "", arr = rands || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 		for (var i=0; i<len; i++) {
@@ -706,7 +720,14 @@
 		    trapezium: function(a, c, h) {return h*((a+c)/2)},
 		    triangle: function(b, h) {return (b*h)/2}
 	    },
+	    ellipseRadialEquivalent: function(a, b) {return (a+b)/2},
 	    perimeter: {
+	    	//PERIMETER OF ELLIPSE
+	    	//if r*r changes to unknown a*b,
+	    	//r can be restored by using the mean formula (a+b)/2
+	    	//however, with the formula 2*pi*r, and a /2,
+	    	//discard 2 on numerator and denominator. :)
+	    	ellipse: function(a, b) {var r = (a+b); return Math.PI*r},
 		    rectangle: function(l, w) {return 2*(l+w)},
 		    square: function(s) {return s*4},
 		    trapezium: function(a, b, c, d) {
@@ -757,6 +778,7 @@
 	    }
     };
 	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
+	exports.getArrayEnd = function(arr) {return arr[arr.length]};
 	exports.getByTagNS = function(nsuri, tag) {return document.getElementsByTagNameNS(nsuri, tag)};
 	Object.assign(exports.getByTagNS, {
 		normal: function(tag) {return getByTag(tag)},
@@ -819,6 +841,40 @@
 	exports.MIN_SAFE_INT = Number.MIN_SAFE_INTEGER;
 	exports.MIN_VAL = Number.MIN_VALUE;
 	exports.makeFalse = function(replacee) {replacee=false;return replacee};
+	//stringified
+	exports.makeRandomBit = function() {return exports.choose([0, 1])};
+	exports.makeRandomByte = function() {
+		return exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]);
+	};
+	//very long :/
+	exports.makeRandomKiloByte = function() {
+		var str = "";
+		for (var i=0; i<1024; i++) {
+			str += exports.choose(["0", "1"]) + exports.choose(["0", "1"]) + exports.choose(["0", "1"]) + exports.choose(["0", "1"]) +
+			       exports.choose(["0", "1"]) + exports.choose(["0", "1"]) + exports.choose(["0", "1"]) + exports.choose(["0", "1"]);
+		}
+		return str;
+	};
+	exports.makeRandomNibble = function() {
+		return exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]) +
+		       exports.choose(["0", "1"]);
+	};
+	exports.makeRandom32Bit = function() {
+		var str = "";
+		for (var i=0; i<32; i++) {
+			str += exports.choose(["0", "1"]);
+		}
+		return str;
+	};
 	exports.makeTrue = function(replacee) {replacee=true;return replacee};
 	exports.NEGATIVE_INFINITY = -Infinity;
 	exports.NaN = window.NaN || Number.NaN;
@@ -846,6 +902,7 @@
     exports.objIs = function(obj, v1, v2) {return obj.is(v1, v2)};
 	exports.ownCons = function() {return exports};
 	exports.ownConstructorSci = function(obj) {obj.prototype.constructorSci = obj};
+	exports.ownRegExp = /sci/i;
 	exports.POSITIVE_INFINITY = exports.Infinity || Infinity;
 	exports.parseFloat = function(str) {return Number.parseFloat(str)};
 	exports.parseInt = function(str, radix) {return Number.parseInt(str, radix)};
@@ -872,6 +929,9 @@
 	exports.power10 = function(exp) {return 10**exp};
 	exports.power2 = function(exp) {return 2**exp};
 	exports.random = function(n){if(n==null){return Math.random()}else{return Math.floor(Math.random()*n)}};
+	exports.randomHexLetVars = ["A", "B", "C", "D", "E", "F"];
+	exports.randomHexNumVars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+	exports.randomHexVars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
 	exports.randomSciIDVars = [
 	    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 	    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
@@ -914,6 +974,7 @@
 	    return arr;
 	};
 	exports.replaceArrayItem = function(arr, n, obj) {for (var i=0; i<arr.length; i++) {if (i==n) {arr[i]=obj}}};
+	exports.reverseBinary = function(a) {return ~ a};
 	exports.root = {
 		cube: function(n){return Math.cbrt(n)},
 		hex: function(n){return Math.sqrt(Math.cbrt(n))},
@@ -1122,6 +1183,7 @@
 	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token x";
 	exports.ERR_THROW = "Uncaught x";
 	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE = "Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be accessed on strict mode functions or the arguments objects for calls to them";
+	exports.ERR_TYPE_ILLEGAL_INVOCATION = "Uncaught TypeError: Illegal invocation";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
 	exports.ERR_TYPE_NUM_UNCREATABLE_PROP = "Uncaught TypeError: Cannot create property x on number y";
 	exports.STRICTERR_SYNTAX_UNEXPECTED_EVALORARGS = "Uncaught SyntaxError: Unexpected eval or arguments in strict mode";
@@ -1142,7 +1204,9 @@ sci.otherMath = { //realities?
     dominoOrientations: function(dominoes, doubles) {var n=dominoes;var f=exports.factorial(n);var m=2**(n-doubles);return m*f;},
     gravityHunDigit: 9.81,
     gravityRounded: 10,
+    gravityTenDigit: 9.8,
     highestAmountNotPossible: function(x, y) {return (x*y)-x-y},
     maxRangeOfCannonAt45deg: function(v, g) {return (v*v)/g},
-    noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)}
+    noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)},
+    permutations: function(n, r) {return sci.factorial(n)/sci.factorial(n-r)},
 };

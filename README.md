@@ -5,6 +5,14 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMain.js)
 ---
+### v1.0011
+- added generateRandomHex and its variable
+- added ellipse perimeter (YES IT'S POSSIBLE) using my own formula
+- planned to add convertBeta but it was 90% same as multiplication
+- added 2 new array functions and an ERR var
+- random bits and bytes
+- added AND function and randomizers
+
 ### v1.0010
 - scattered some sci math functions and values
 - added more Math numbers

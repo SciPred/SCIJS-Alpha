@@ -14,7 +14,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
 	var sinceStart = 0;
-	var VERSION = "1.0000";
+	var VERSION = "1.0001";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -118,7 +118,8 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			}
 		}
 	}//
-	function fullHeightElement(elm) {document.body.style.margin=0;elm.style.height=document.body.height} //using given body height because editing the body height may cause problems
+	function fullHeightElement(elm) {document.body.style.margin=0;elm.style.height=document.body.height}
+	//using given body height because editing the body height may cause problems
 	function getByClass(cls) {return document.getElementsByClassName(cls)}//
 	function getById(id) {return document.getElementById(id)}//
 	function getByName(name) {return document.getElementsByName(name)}//
@@ -208,7 +209,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.stringIncludes = stringIncludes;
 	function stringLen(str) {return str.length}
 	exports.stringLen = stringLen
-	function stringRepeat(str, times) {if(times<0){console.warn("sci.stringRepeat: times is negative: "+times+", turning into positive.");return str.repeat(Math.abs(times))}else{return str.repeat(times)}}
+	function stringRepeat(str, times) {
+		if(times<0){console.warn("sci.stringRepeat: times is negative: "+times+", turning into positive.");return str.repeat(Math.abs(times))}
+		else{return str.repeat(times)}
+	}
 	exports.stringRepeat = stringRepeat;
 	function stringReplace(str, replacee, sub) {return str.replace(replacee, sub)}
 	exports.stringReplace = stringReplace;
@@ -232,7 +236,9 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.toggleText = toggleText;
     function triggerButtonOnKey(btn, keyevt, key) {btn.addEventListener(keyevt, function(event) {if (event.key === key) {event.preventDefault();btn.click()}})}
     exports.triggerButtonOnKey = triggerButtonOnKey;
-    function triggerButtonOnKeyCode(btn, keyevt, keycode) {btn.addEventListener(keyevt, function(event) {if (event.keyCode === keycode) {event.preventDefault();btn.click()}})}
+    function triggerButtonOnKeyCode(btn, keyevt, keycode) {
+    	btn.addEventListener(keyevt, function(event) {if (event.keyCode === keycode) {event.preventDefault();btn.click()}})
+    }
     exports.triggerButtonOnKeyCode = triggerButtonOnKeyCode;
 	//using x as the problem (by console.errors)
     exports.ERR_ERR = "Uncaught Error: x";
@@ -244,7 +250,8 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.ERR_SYNTAX_UNEXPECTED_IDENTIFIER = "Uncaught SyntaxError: Unexpected identifier";
 	exports.ERR_SYNTAX_UNEXPECTED_TOKEN = "Uncaught SyntaxError: Unexpected token x";
 	exports.ERR_THROW = "Uncaught x";
-	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE = "Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be accessed on strict mode functions or the arguments objects for calls to them";
+	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE="Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be "+
+	    "accessed on strict mode functions or the arguments objects for calls to them";
 	exports.ERR_TYPE_ILLEGAL_INVOCATION = "Uncaught TypeError: Illegal invocation";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
 	exports.ERR_TYPE_NUM_UNCREATABLE_PROP = "Uncaught TypeError: Cannot create property x on number y";
@@ -268,7 +275,9 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.IsFunction = function(arg) {return typeof arg === "function"};
 	exports.IsInteger = function(n) {return Number.isInteger(n)};
 	exports.IsObject = function(arg) {return typeof arg === "object"};
-	exports.IsOnCapsLock = function(input, keyevt) {input.addEventListener(keyevt, function(event) {if (event.getModifierState("CapsLock")) {return true} else {return false}})};
+	exports.IsOnCapsLock = function(input, keyevt) {
+		input.addEventListener(keyevt, function(event) {if (event.getModifierState("CapsLock")) {return true} else {return false}})
+	};
 	exports.IsPerfectWhole = function(n, exp) {var m=n**(1/exp);return Math.round(m)==m};
 	exports.IsSafeInteger = function(int) {return Number.isSafeInteger(int)};
 	exports.IsString = function(arg) {return typeof arg === "string"};
@@ -300,6 +309,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		        exports.choose(["0", "1"]) +
 		        exports.choose(["0", "1"]);
 	    },
+	    match: function(rands, match) {var rnd = rands || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], mtc = match || 0;return (exports.choose(rnd) === mtc)},
 		randomHexLetVars: ["A", "B", "C", "D", "E", "F"],
 		randomHexNumVars: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
 		randomHexVars: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"],
@@ -368,7 +378,11 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
         multiplication: function(val){var x=val.length,count=1;for(var i = 0; i < x; i++){count *= val[i];}return count},
  	    summation: function(val){var x=val.length,count=0;for(var i = 0; i < x; i++){count += val[i];}return count}
     };
-    exports.array = {};
+    exports.array = {
+    	getItem: function(arr, n) {return arr[n]},
+    	isItem: function(arr, n, item) {return arr[n] === item},
+    	setItem: function(arr, n, item) {arr[n] = item;return arr}
+    };
     exports.array.addItemToEnd = function(arr, item) {arr[arr.length] = item;return arr};
 	exports.array.repeatItem = function(len, items, replacee) {
 		var arr = replacee || [];
@@ -459,7 +473,80 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		for (i=0; i<n+1; i++) {count *= i}
 		return count;
 	};
-	exports.getArguments = function(obj) {if (obj.arguments !== undefined) {return obj.arguments} else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}};
+	exports.geometry = {
+		area: {
+	   	    annulus: function(r1, r2) {return Math.PI*(r1-r2)},
+	       	circle: function(r) {return Math.PI*(r*r)},
+	        circleLog: function(c, d) {return c*d/4},
+	        ellipse: function(a, b) {return (Math.PI)*a*b},
+	        lunarCrescent: function(c, d) {return (1/4)*Math.PI*c*d},
+	        rectangle: function(l, w) {return l*w},
+	        rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
+	        square: function(s) {return s*s},
+	        trapezium: function(a, c, h) {return h*((a+c)/2)},
+		    triangle: function(b, h) {return (b*h)/2}
+	    },
+	    ellipseRadialEquivalent: function(a, b) {return (a+b)/2},
+	    perimeter: {
+	       	//PERIMETER OF ELLIPSE
+	       	//if r*r changes to unknown a*b,
+	       	//r can be restored by using the mean formula (a+b)/2
+	       	//however, with the formula 2*pi*r, and the /2 in the mean formula,
+	       	//discard 2 on numerator and denominator. :)
+	       	ellipse: function(a, b) {var r = (a+b); return Math.PI*r},
+	        rectangle: function(l, w) {return 2*(l+w)},
+	        square: function(s) {return s*4},
+	        trapezium: function(a, b, c, d) {
+		        var e = a || 1;
+		        var f = b || e;
+		        var g = c || f;
+		        var h = d || g;
+		        return e+f+g+h;
+	        },
+	        triangle: function(a, b, c) {
+		        var d = a || 1;
+		        var e = b || d;
+		        var f = c || e;
+		        return d+e+f;
+	        }
+	    },
+        tsa: {
+	        cube: function(s) {return 6*(s*s)},
+	        cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
+	        cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
+	        sphere: function(r) {return 4*Math.PI*(r**2)},
+	        torus: function (r, R) {
+	    	    var p = Math.PI**2;
+	    	    return 4*p*R*r*r;
+	        },
+	        tube: function(h, r1, r2) {
+	    	    var a = r1**2, b = r2**2, p = 2*Math.PI;
+		        return p*((a-b)+(h*(a+b)));
+	        }
+        },
+        volume: {
+	        cone: function(r, h) {var a=Math.PI*(1/3),b=r*r*h;return a*b},
+	        cube: function(s) {return s**3},
+	        cuboid: function(l, w, h) {return l*w*h},
+	        cylinder: function(r, h) {return Math.PI*(r*r)*h},
+	        ellipsoid: function(a, b, c) {return (4/3)*Math.PI*a*b*c},
+	        ellipsoidOblate: function(a, b) {return (4/3)*Math.PI*a*a*b},
+	        ellipsoidProlate: function(a, b) {return (4/3)*Math.PI*a*b*b},
+	        sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b},
+	        torus: function(r, R) {
+	    	    var p = Math.PI**2;
+		        return 2*p*R*r*r;
+		    },
+		    tube: function(h, r1, r2) {
+			    var a = 2*r1*Math.PI*h, b = 2*r2*Math.PI*h;
+			    return a-b;
+	        }
+	    }
+	};
+	exports.getArguments = function(obj) {
+		if (obj.arguments !== undefined) {return obj.arguments}
+		else {console.error("sci.getArguments: arguments of obj are either unavailable or undefined.")}
+	};
 	exports.getArrayEnd = function(arr) {return arr[arr.length]};
 	exports.getByTagNS = function(nsuri, tag) {return document.getElementsByTagNameNS(nsuri, tag)};
 	Object.assign(exports.getByTagNS, {
@@ -468,10 +555,14 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	});
 	exports.getLength = function(obj) {return obj.length};
 	exports.getName = function(obj) {return obj.name};
-	exports.getPrototype = function(obj) {if (obj.prototype !== undefined) {return obj.prototype} else {console.error("sci.getPrototype: obj.prototype is undefined.")}};
+	exports.getPrototype = function(obj) {
+		if (obj.prototype !== undefined) {return obj.prototype}
+		else {console.error("sci.getPrototype: obj.prototype is undefined.")}
+	};
 	exports.getSingleElement = function(id, n) {
 		var i = n || 0;
-		var elm = document.getElementById(id) || document.getElementsByName(id)[i] || document.getElementsByClassName(id)[i] || document.getElementsByTagName(id)[i] || id[i];
+		var elm = document.getElementById(id) || document.getElementsByName(id)[i] || 
+		document.getElementsByClassName(id)[i] || document.getElementsByTagName(id)[i] || id[i];
 		return elm;
 	};
 	Object.assign(exports.getSingleElement, {
@@ -585,6 +676,17 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.newObject = function() {return new Object()};
 	exports.newRegExp = function() {return new RegExp()};
 	exports.newString = function() {return new String()};
+	exports.nth = {
+		centeredHexagonalNumber: function(nth) {return ((3*(nth**2)) - (nth*3) + 1)},
+	    evenNumber: function(nth) {return 2*nth},
+	    fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
+	    oddNumber: function(nth) {return nth+(nth-1)},
+	    pentagonalNumber: function(nth) {return (nth*((3*nth)-1))/2},
+	    squareNumber: function(nth) {return nth**2},
+	    squarePyramidNumber: function(nth) {return ((2*(nth**3)) + (3*(nth**2)) + nth)/6},
+	    tetrahedralNumber: function(nth) {return ((nth**3) + (3*(nth**2)) + (2*nth))/6},
+	    triangleNumber: function(nth) {var m = nth*(nth + 1);return m/2}
+    };
     exports.objAssign = function(target, src) {Object.assign(target, src);return target};
     exports.objFreeze = function(obj, x) {obj.freeze(x);return obj};
     exports.objIs = function(obj, v1, v2) {return obj.is(v1, v2)};
@@ -765,81 +867,6 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 
 }));
 //others
-sci.geometry = {
-    area: {
-	   	annulus: function(r1, r2) {return Math.PI*(r1-r2)},
-	   	circle: function(r) {return Math.PI*(r*r)},
-	    circleLog: function(c, d) {return c*d/4},
-	    ellipse: function(a, b) {return (Math.PI)*a*b},
-	    lunarCrescent: function(c, d) {return (1/4)*Math.PI*c*d},
-	    rectangle: function(l, w) {return l*w},
-	    rectangleCornersRounded: function(l, w, r) {return ((l*w)-((r*r)*(4-Math.PI)))},
-	    square: function(s) {return s*s},
-	    trapezium: function(a, c, h) {return h*((a+c)/2)},
-		triangle: function(b, h) {return (b*h)/2}
-	},
-	ellipseRadialEquivalent: function(a, b) {return (a+b)/2},
-	perimeter: {
-	   	//PERIMETER OF ELLIPSE
-	   	//if r*r changes to unknown a*b,
-	   	//r can be restored by using the mean formula (a+b)/2
-	   	//however, with the formula 2*pi*r, and a /2,
-	   	//discard 2 on numerator and denominator. :)
-	   	ellipse: function(a, b) {var r = (a+b); return Math.PI*r},
-	    rectangle: function(l, w) {return 2*(l+w)},
-	    square: function(s) {return s*4},
-	    trapezium: function(a, b, c, d) {
-		    var e = a || 1;
-		    var f = b || e;
-		    var g = c || f;
-		    var h = d || g;
-		    return e+f+g+h;
-	    },
-	    triangle: function(a, b, c) {
-		    var d = a || 1;
-		    var e = b || d;
-		    var f = c || e;
-		    return d+e+f;
-	    }
-	},
-    tsa: {
-	    cube: function(s) {return 6*(s*s)},
-	    cuboid: function(l, w, h) {return (2*l*w)+(2*w*h)+(2*h*l)},
-	    cylinder: function(r, h) {return 2*Math.PI*r*(h+r)},
-	    sphere: function(r) {return 4*Math.PI*(r**2)},
-	    torus: function (r, R) {
-	    	var p = Math.PI**2;
-	    	return 4*p*R*r*r;
-	    },
-	    tube: function(h, r1, r2) {
-	    	var a = r1**2, b = r2**2, p = 2*Math.PI;
-		    return p*((a-b)+(h*(a+b)));
-	    }
-    },
-    volume: {
-	    cone: function(r, h) {var a=Math.PI*(1/3),b=r*r*h;return a*b},
-	    cube: function(s) {return s**3},
-	    cuboid: function(l, w, h) {return l*w*h},
-	    cylinder: function(r, h) {return Math.PI*(r*r)*h},
-	    ellipsoid: function(a, b, c) {return (4/3)*Math.PI*a*b*c},
-	    ellipsoidOblate: function(a, b) {return (4/3)*Math.PI*a*a*b},
-	    ellipsoidProlate: function(a, b) {return (4/3)*Math.PI*a*b*b},
-	    sphere: function(r) {var a=(4/3)*Math.PI,b=r**3;return a*b},
-	    torus: function(r, R) {
-	    	var p = Math.PI**2;
-		    return 2*p*R*r*r;
-		},
-		tube: function(h, r1, r2) {
-			var a = 2*r1*Math.PI*h, b = 2*r2*Math.PI*h;
-			return a-b;
-	    }
-	}
-};
-sci.nth = {
-	evenNumber: function(nth) {return 2*nth},
-	fibonacciSeriesNumber: function(nth) {return Math.round((1.618**nth)/Math.sqrt(5))},
-	oddNumber: function(nth) {return nth+(nth-1)}
-};
 sci.otherMath = { //realities?
 	acceleration: function(s, t) {return s/t},
     angleDegreesBetweenTwoClockHands: function(m, h) {return (5.5*m)-(30*h)}, //degrees

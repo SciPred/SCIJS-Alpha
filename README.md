@@ -5,6 +5,13 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0004
+- added SCI.ringGeometry and SCI.rectRingGeometry
+- copied some sci customs to SCI
+- also put __SETTINGS__ but it's only a shortcut for sci
+- added convertBinary (e.g. "0101" to 5) and reverseString (e.g. "hello" to "olleh");
+- added SCI.reqFrame and triangle geometries
+
 ### v1.0003
 - put the most dangerous settings in _DangerSettings_
 - added many more settings

@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0003";
+	var VERSION = "1.0004";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -471,6 +471,16 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.color.rgbToHex = function(r, g, b) {
 		return "#" + exports.color.componentToHex(r) + exports.color.componentToHex(g) + exports.color.componentToHex(b);
     };
+    exports.convertBinary = function(string) { // eg "10010"
+    	var number = 0;
+    	var str = exports.reverseString(string);
+    	var j;
+    	for (var i=str.length; i>0; i--) {
+    		j = i - 1; //for 012 (arr choosing) not 123 (.length)
+    		if (str[j]=="1" || str[j]==1) {number += (2 ** j)}
+    	}
+    	return number;
+    };
     exports.createButton = function(html) {
     	var btn = document.createElement("BUTTON");
     	btn.innerHTML = html;
@@ -771,6 +781,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
             exports.removeClassElement(elements[i], name);
         }
     };
+    exports.reverseString = function(str) {return str.split("").reverse().join("")};
 	exports.rot3d = function(elm, x, y, z, angle) {elm.style.transform = "rotate3d("+x+","+y+","+z+","+angle+")"};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
         if (!isNaN(ms) || ms == 0) {
@@ -935,8 +946,18 @@ sci.otherMath = { //realities?
 	(global = global || self, factory(global.SCI = function(arg) {return arg}));
 }(this, function (exports) {
 	var DEG = Math.PI / 180;
+	exports.VERSION = sci.VERSION;
+	exports.constructor = Object;
+	exports.constructor.IS_EXPORTS_DEPENDENT = true;
+	exports.constructor.IS_GLOBALLY_SCATTERED = true;
+	exports.constructor.IS_SCI = true;
+	if (window.sci !== undefined) {exports.constructor.IS_IN_WINDOW = true}
+	else {exports.constructor.IS_IN_WINDOW = false}
+	exports.__SETTINGS__ = sci.__SETTINGS__ || "unavailable";
+	//funcs
 	exports.DEG = DEG;
 	exports.rotate = function(ctx, angle) {ctx.rotate(angle)};
+	exports.reqFrame = function(func) {requestAnimationFrame(func)};
 	exports.drawVertices = function(ctx, vertices, stroke, fill) { //dependent
 		var x, y;
 		ctx.beginPath();
@@ -979,10 +1000,60 @@ sci.otherMath = { //realities?
     		    c.x+dx, c.y-dy, //top right
     		    c.x+dx, c.y+dy, //bottom right
     		    c.x-dx, c.y+dy, //bottom left
-    		    c.x-dx, c.y-dy, //top left again
+    		    c.x-dx, c.y-dy  //top left again
     		];
     		exports.drawVertices(ctx, vertices, stroke, fill);
     	}
+    };
+    exports.rectRingGeometry = function(ctx, center, distanceX1, distanceX2, distanceY1, distanceY2, stroke1, stroke2, fill1, fill2) {
+    	var dx1 = distanceX1 || 10; var dx2 = distanceX2 || 5;
+    	var dy1 = distanceY1 || 20; var dy2 = distanceY2 || 10;
+    	var c = center || {x: 100, y:100};
+    	var vertices1 = [
+    		c.x-dx1, c.y-dy1, //top left
+    		c.x+dx1, c.y-dy1, //top right
+    		c.x+dx1, c.y+dy1, //bottom right
+    		c.x-dx1, c.y+dy1, //bottom left
+    		c.x-dx1, c.y-dy1  //top left again
+    	];
+    	exports.drawVertices(ctx, vertices1, stroke1, fill1);
+
+    	var vertices2 = [
+    		c.x-dx2, c.y-dy2, //top left
+    		c.x+dx2, c.y-dy2, //top right
+    		c.x+dx2, c.y+dy2, //bottom right
+    		c.x-dx2, c.y+dy2, //bottom left
+    		c.x-dx2, c.y-dy2  //top left again
+    	];
+    	exports.drawVertices(ctx, vertices2, stroke2, fill2);
+    };
+    exports.rightTriangleGeometry = function(ctx, rightPoint, distanceX, distanceY, stroke, fill) { //rightPoint at 90deg
+    	var c = rightPoint || {x: 100, y: 100};
+    	var dx = distanceX || 10; var dy = distanceY || -10;
+    	var vertices = [
+    	    c.x, c.y,    //rightPoint
+    	    c.x+dx, c.y, //horizontal
+    	    c.x, c.y+dy, //vertical
+    	    c.x, c.y     //rightPoint again
+    	];
+    	exports.drawVertices(ctx, vertices, stroke, fill);
+    };
+    exports.ringGeometry = function(ctx, center, rad1, rad2, stroke1, stroke2, fill1, fill2) {
+    	var r1 = rad1 || 10; var r2 = rad2 || 5;
+    	var c = center || {x: 100, y: 100};
+    	ctx.beginPath();
+    	ctx.arc(c.x, c.y, r1, 0, 2 * Math.PI, false);
+    	ctx.strokeStyle = stroke1 || "black";
+		ctx.stroke();
+		if (fill1 !== undefined) {ctx.fillStyle=fill1;ctx.fill()}
+    	else {ctx.closePath()}
+
+    	ctx.beginPath();
+        ctx.arc(c.x, c.y, r2, 0, 2 * Math.PI, false);
+    	ctx.strokeStyle = stroke2 || "black";
+		ctx.stroke();
+		if (fill2 !== undefined) {ctx.fillStyle=fill2;ctx.fill()}
+    	else {ctx.closePath()}
     };
     exports.squareGeometry = function(ctx, center, distance, stroke, fill) { //center for c.x, c.y
     	var d = distance || 10;
@@ -993,6 +1064,17 @@ sci.otherMath = { //realities?
     	    c.x+d, c.y+d, //bottom right
     	    c.x-d, c.y+d, //bottom left
     	    c.x-d, c.y-d  //top left again
+    	];
+    	exports.drawVertices(ctx, vertices, stroke, fill);
+    };
+    exports.triangleGeometry = function(ctx, point, distanceX, distanceY, stroke, fill) {
+    	var c = point || {x: 100, y: 100};
+    	var dx = distanceX || 7; var dy = distanceY || 10;
+    	var vertices = [
+    	    c.x, c.y,
+    	    c.x, c.y+dy,
+    	    c.x+dx, c.y+(dy/2),
+    	    c.x, c.y
     	];
     	exports.drawVertices(ctx, vertices, stroke, fill);
     };

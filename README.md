@@ -5,6 +5,16 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0003
+- put the most dangerous settings in _DangerSettings_
+- added many more settings
+- added SCI variable: no settings, just some simple canvas functions
+- with SCI you can now draw some shapes!
+
+### v1.0002
+- added some few more stuff
+- added __SETTINGS__! You can now kinda ruin my work :/
+
 ### v1.0001
 - added 3 new array item functions
 - added new nth functions

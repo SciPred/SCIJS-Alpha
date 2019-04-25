@@ -13,8 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var sinceStart = 0;
-	var VERSION = "1.0001";
+	var VERSION = "1.0003";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -56,9 +55,12 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	}
 	exports.VERSION = VERSION;
 	console.log("SciPred\'s JS " + VERSION);
-	exports.constructor = exports;
+	exports.constructor = Object;
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
+	exports.constructor.IS_GLOBALLY_SCATTERED = true;
 	exports.constructor.IS_SCI = true;
+	if (window.sci !== undefined) {exports.constructor.IS_IN_WINDOW = true}
+	else {exports.constructor.IS_IN_WINDOW = false}
 	exports.ownRegExp = /sci/i;
 	setInterval(setSSS, 1);
 	function setSSS() {
@@ -75,7 +77,6 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		exports.nav = navigator;
 		exports.doc = document;
 		exports.Math = Math;
-		exports.sinceStart += 1;
 	}
 	function addClass(elm, cls) {elm.classList.add(cls)}//
 	function arrayEqualsItem(arr, num, eq) {return arr[num]==eq}//
@@ -257,6 +258,45 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.ERR_TYPE_NUM_UNCREATABLE_PROP = "Uncaught TypeError: Cannot create property x on number y";
 	exports.STRICTERR_SYNTAX_UNEXPECTED_EVALORARGS = "Uncaught SyntaxError: Unexpected eval or arguments in strict mode";
 	exports.STRICTERR_SYNTAX_UNQUALIFIED_IDENTIFIER = "Uncaught SyntaxError: Delete of an unqualified identifier in strict mode.";
+	//SETTINGS
+	exports.__SETTINGS__ = {
+		addToLocalStorage: function() {
+			if (localStorage.sci === undefined) {localStorage.sci = exports} else {
+				if (confirm("There is an existing localStorage.sci value.\nWould you like to replace it?")) {localStorage.sci = exports}
+			}
+		},
+		retrieveFromLocalStorage: function() {
+			if (localStorage.sci !== exports) {
+				if (confirm("WARNING: the current localStorage.sci value is either not a sci variable or an older version.\nWould you like to continue?")) {
+					exports = localStorage.sci;
+				}
+			} else {
+				exports = localStorage.sci;
+				localStorage.sci = undefined;
+			}
+		},
+		toggleMath: function() {
+			if (Math.sci === undefined) {Math.sci = window.sci.math || exports.math} else {Math.sci = undefined}
+		},
+	    toggleSciInDocument: function() {
+	    	if (document.sci === undefined) {document.sci = window.sci || exports} else {document.sci = undefined}
+	    },
+	    _DangerSettings_: {
+	    	documentSci: function() {
+	    		exports = {
+	    			console: console,
+	    			document: document,
+	    			localStorage: localStorage,
+	    			Math: Math,
+	    			navigator: navigator,
+	    			window: window
+	    		};
+	    	},
+	    	emptySci: function() {exports = {}; SCI = {}},
+	    	removeSci: function() {window.sci = undefined;alert("SCI IS NOW UNUSABLE")}
+	    }
+	};
+	exports.__SETTINGS__.toggleSciInDocument.NOTE = function() {console.warn("This only handles with the document, not the window.")};
 
 
 
@@ -601,6 +641,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		MIN_VAL: Number.MIN_VALUE,
 		NAN: NaN || window.NaN,
 		NEGATIVE_INFINITY: -Infinity,
+		NULL: null,
 		PI1: 3.14,
 		PI2: 3.1416,
 		PI3: 3.1415962536,
@@ -885,3 +926,74 @@ sci.otherMath = { //realities?
     noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)},
     permutations: function(n, r) {return sci.factorial(n)/sci.factorial(n-r)},
 };
+
+
+//SCI for canvases
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(global = global || self, factory(global.SCI = function(arg) {return arg}));
+}(this, function (exports) {
+	var DEG = Math.PI / 180;
+	exports.DEG = DEG;
+	exports.rotate = function(ctx, angle) {ctx.rotate(angle)};
+	exports.drawVertices = function(ctx, vertices, stroke, fill) { //dependent
+		var x, y;
+		ctx.beginPath();
+		ctx.moveTo(vertices[0], vertices[1]);
+		for (var i=2; i<vertices.length; i+=2) {
+			x = vertices[i]; y = vertices[i+1];
+			ctx.lineTo(x, y);
+		}
+		ctx.strokeStyle = stroke || "black";
+		ctx.stroke();
+		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		else {ctx.closePath()}
+	};
+
+    //dependencies
+    exports.arcGeometry = function(ctx, center, radius, startAngle, endAngle, isCounter, stroke, fill) {
+    	var r = radius || 10;
+    	var sA = startAngle || 0;
+    	var eA = endAngle || Math.PI;
+    	var c = center || {x: 100, y: 100};
+    	ctx.beginPath();
+    	ctx.arc(c.x, c.y, r, sA, eA, isCounter);
+    	ctx.strokeStyle = stroke || "black";
+		ctx.stroke();
+		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+    	else {ctx.closePath()}
+    };
+    exports.circleGeometry = function(ctx, center, radius, stroke, fill) {
+    	var e = 2 * Math.PI;
+    	exports.arcGeometry(ctx, center, radius, 0, e, false, stroke, fill);
+    };
+    exports.rectGeometry = function(ctx, center, distanceX, distanceY, stroke, fill) {
+    	if (distanceX === distanceY) {exports.squareGeometry(ctx, center, distanceX, stroke, fill)}
+    	else {
+    		var dx = distanceX || 10;
+    		var dy = distanceY || 20;
+    		var c = center || {x: 100, y:100};
+    		var vertices = [
+    		    c.x-dx, c.y-dy, //top left
+    		    c.x+dx, c.y-dy, //top right
+    		    c.x+dx, c.y+dy, //bottom right
+    		    c.x-dx, c.y+dy, //bottom left
+    		    c.x-dx, c.y-dy, //top left again
+    		];
+    		exports.drawVertices(ctx, vertices, stroke, fill);
+    	}
+    };
+    exports.squareGeometry = function(ctx, center, distance, stroke, fill) { //center for c.x, c.y
+    	var d = distance || 10;
+    	var c = center || {x: 100, y:100};
+    	var vertices = [
+    	    c.x-d, c.y-d, //top left
+    	    c.x+d, c.y-d, //top right
+    	    c.x+d, c.y+d, //bottom right
+    	    c.x-d, c.y+d, //bottom left
+    	    c.x-d, c.y-d  //top left again
+    	];
+    	exports.drawVertices(ctx, vertices, stroke, fill);
+    };
+}));

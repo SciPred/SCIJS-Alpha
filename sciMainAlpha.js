@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0004";
+	var VERSION = "1.0005";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -304,6 +304,43 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 
 
 	//FUNCTIONS (0-9, A-Z, a-z)
+	exports.Binary = {
+		AND: function(a, b) {
+			if (a === 1 && b === 1) {return 1}
+			return 0;
+		},
+		NAND: function(a, b) {
+			if (a === 1 && b === 1) {return 0}
+			return 1;
+		},
+		NOR: function(a, b) {
+			if (a === 0 && b === 0) {return 1}
+			return 0;
+		},
+		NOT: function(a) {if (a === 0) {return 1} else {return 0}},
+		OFF: 0,
+		ON: 1,
+		OR: function(a, b) {
+			if (a === 0 && b === 0) {return 0}
+			return 1;
+		},
+		XNOR: function(a, b) {
+			if (a === b) {return 1}
+			return 0;
+		},
+		XOR: function(a, b) {
+			if (b === a && a === 0) {return 0}
+			if (b === a && a === 1) {return 0}
+			return 1;
+		},
+
+		reverse: function(bin) {
+			if (bin === true || bin === 1) {return 0}
+			if (bin === false || bin === 0) {return 1}
+			return undefined;
+		},
+		reverseString: function(str) {exports.reverseString(str)}
+	};
 	exports.HasConsole = function() {return typeof console !== "undefined"};
 	exports.HasDocumentBody = function() {return document.body !== undefined};
 	exports.HasWebWorker = function() {return typeof Worker !== undefined};
@@ -356,7 +393,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		randomSciIDVars: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
 	        "q", "r", "s", "t", "u", "v", "w", "x", "y", "z","A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
 	        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z","-", "_", "$", "&", "#", "@", "?"
-	    ]
+	    ],
 	};
 	exports.Random.generateRandomArray = function(len, replacee, items) {
 		var arr = replacee || [];
@@ -781,6 +818,11 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
             exports.removeClassElement(elements[i], name);
         }
     };
+    exports.reverseArray = function(arr) {arr.reverse();return arr};
+    exports.reverseBoolean = function(bool) {
+    	if (bool === true) {return false}
+    	return true;
+    };
     exports.reverseString = function(str) {return str.split("").reverse().join("")};
 	exports.rot3d = function(elm, x, y, z, angle) {elm.style.transform = "rotate3d("+x+","+y+","+z+","+angle+")"};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
@@ -951,6 +993,7 @@ sci.otherMath = { //realities?
 	exports.constructor.IS_EXPORTS_DEPENDENT = true;
 	exports.constructor.IS_GLOBALLY_SCATTERED = true;
 	exports.constructor.IS_SCI = true;
+	exports.prototypeExternal = sci || "unavailable";
 	if (window.sci !== undefined) {exports.constructor.IS_IN_WINDOW = true}
 	else {exports.constructor.IS_IN_WINDOW = false}
 	exports.__SETTINGS__ = sci.__SETTINGS__ || "unavailable";
@@ -970,9 +1013,52 @@ sci.otherMath = { //realities?
 		ctx.stroke();
 		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
 		else {ctx.closePath()}
-	};
+	};useFunc(exports.drawVertices);
 
-    //dependencies
+    //text
+    exports.text = function(ctx, point, text, font, fillStyle, maxWidth) {
+    	ctx.font = font || "20px Georgia";
+    	ctx.fillStyle = fillStyle || "black";
+    	var t = text || "Hello World!";
+    	var p = point || {x: 100, y: 100};
+    	ctx.fillText(t, p.x, p.y, maxWidth);
+    };useFunc(exports.text);
+
+    //lines
+    exports.basicLine = function(ctx, startVertices, endVertices, stroke, fill) {
+    	var s = startVertices || {x: 100, y: 100}; var e = endVertices || {x: 200, y: 200};
+    	var vertices = [s.x, s.y, e.x, e.y];
+    	exports.drawVertices(ctx, vertices, stroke, fill);
+    };useFunc(exports.basicLine);
+    exports.dashedLine = function(ctx, Vertices, segments, stroke, fill) {
+    	var vertices = Vertices || [100, 100, 100, 300];
+    	var s = segments || [5, 15];
+    	ctx.beginPath();
+		ctx.setLineDash(s);
+		ctx.moveTo(vertices[0], vertices[1]);
+		for (var i=2; i<vertices.length; i+=2) {
+			x = vertices[i]; y = vertices[i+1];
+			ctx.lineTo(x, y);
+		}
+		ctx.strokeStyle = stroke || "black";
+		ctx.stroke();
+		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		else {ctx.closePath()}
+    };useFunc(exports.dashedLine);
+
+    //geometry assignments and other flips
+    exports.isPointInPath = function(ctx, x, y) {return ctx.isPointInPath(x, y)};
+    function useFunc(func) {
+    	func.mainType = "Geometry";
+    	Object.assign(func, {
+    		getDetails: function() {return func},
+    		getDetailsString: function() {return "" + func},
+    		getLength: function() {return func.length},
+    		getMainType: function() {return func.mainType}
+    	});
+    };
+
+    //geometries
     exports.arcGeometry = function(ctx, center, radius, startAngle, endAngle, isCounter, stroke, fill) {
     	var r = radius || 10;
     	var sA = startAngle || 0;
@@ -984,11 +1070,20 @@ sci.otherMath = { //realities?
 		ctx.stroke();
 		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
     	else {ctx.closePath()}
-    };
+    };useFunc(exports.arcGeometry);
     exports.circleGeometry = function(ctx, center, radius, stroke, fill) {
     	var e = 2 * Math.PI;
     	exports.arcGeometry(ctx, center, radius, 0, e, false, stroke, fill);
-    };
+    };useFunc(exports.circleGeometry);
+    exports.ellipseGeometry = function(ctx, center, radiusX, radiusY, rotation, startAngle, endAngle, isCounter, stroke, fill) {
+    	ctx.beginPath();
+    	var c = center || {x: 100, y: 100};
+    	ctx.ellipse(c.x, c.y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter);
+    	ctx.strokeStyle = stroke || "black";
+    	ctx.stroke();
+		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+    	else {ctx.closePath()}
+    };useFunc(exports.ellipseGeometry);
     exports.rectGeometry = function(ctx, center, distanceX, distanceY, stroke, fill) {
     	if (distanceX === distanceY) {exports.squareGeometry(ctx, center, distanceX, stroke, fill)}
     	else {
@@ -1004,7 +1099,7 @@ sci.otherMath = { //realities?
     		];
     		exports.drawVertices(ctx, vertices, stroke, fill);
     	}
-    };
+    };useFunc(exports.rectGeometry);
     exports.rectRingGeometry = function(ctx, center, distanceX1, distanceX2, distanceY1, distanceY2, stroke1, stroke2, fill1, fill2) {
     	var dx1 = distanceX1 || 10; var dx2 = distanceX2 || 5;
     	var dy1 = distanceY1 || 20; var dy2 = distanceY2 || 10;
@@ -1017,7 +1112,6 @@ sci.otherMath = { //realities?
     		c.x-dx1, c.y-dy1  //top left again
     	];
     	exports.drawVertices(ctx, vertices1, stroke1, fill1);
-
     	var vertices2 = [
     		c.x-dx2, c.y-dy2, //top left
     		c.x+dx2, c.y-dy2, //top right
@@ -1026,7 +1120,7 @@ sci.otherMath = { //realities?
     		c.x-dx2, c.y-dy2  //top left again
     	];
     	exports.drawVertices(ctx, vertices2, stroke2, fill2);
-    };
+    };useFunc(exports.rectRingGeometry);
     exports.rightTriangleGeometry = function(ctx, rightPoint, distanceX, distanceY, stroke, fill) { //rightPoint at 90deg
     	var c = rightPoint || {x: 100, y: 100};
     	var dx = distanceX || 10; var dy = distanceY || -10;
@@ -1037,7 +1131,7 @@ sci.otherMath = { //realities?
     	    c.x, c.y     //rightPoint again
     	];
     	exports.drawVertices(ctx, vertices, stroke, fill);
-    };
+    };useFunc(exports.rightTriangleGeometry);
     exports.ringGeometry = function(ctx, center, rad1, rad2, stroke1, stroke2, fill1, fill2) {
     	var r1 = rad1 || 10; var r2 = rad2 || 5;
     	var c = center || {x: 100, y: 100};
@@ -1054,7 +1148,14 @@ sci.otherMath = { //realities?
 		ctx.stroke();
 		if (fill2 !== undefined) {ctx.fillStyle=fill2;ctx.fill()}
     	else {ctx.closePath()}
-    };
+    };useFunc(exports.ringGeometry);
+    exports.starGeometry = function(ctx, point, stroke, fill) {
+    	var c = point || {x: 100, y: 100};
+    	var vertices = [
+    	    c.x, c.y,
+    	    c.x, c.y
+    	];
+    };useFunc(exports.starGeometry);
     exports.squareGeometry = function(ctx, center, distance, stroke, fill) { //center for c.x, c.y
     	var d = distance || 10;
     	var c = center || {x: 100, y:100};
@@ -1066,8 +1167,21 @@ sci.otherMath = { //realities?
     	    c.x-d, c.y-d  //top left again
     	];
     	exports.drawVertices(ctx, vertices, stroke, fill);
-    };
-    exports.triangleGeometry = function(ctx, point, distanceX, distanceY, stroke, fill) {
+    };useFunc(exports.squareGeometry);
+    exports.trapezoidGeometry = function(ctx, center, base1, base2, height, stroke, fill) {
+    	var c = center || {x: 100, y:100};
+    	var b1 = base1 || 17; var b2 = base2 || 10;
+    	var h = height || 7;
+    	var vertices = [
+    	    c.x-(b1/2), c.y+(h/2), //tl
+    	    c.x+(b1/2), c.y+(h/2), //tr
+    	    c.x+(b2/2), c.y-(h/2), //br
+    	    c.x-(b2/2), c.y-(h/2), //bl
+    	    c.x-(b1/2), c.y+(h/2)
+    	];
+    	exports.drawVertices(ctx, vertices, stroke, fill);
+    };useFunc(exports.trapezoidGeometry);
+    exports.trianglePointGeometry = function(ctx, point, distanceX, distanceY, stroke, fill) {
     	var c = point || {x: 100, y: 100};
     	var dx = distanceX || 7; var dy = distanceY || 10;
     	var vertices = [
@@ -1077,5 +1191,5 @@ sci.otherMath = { //realities?
     	    c.x, c.y
     	];
     	exports.drawVertices(ctx, vertices, stroke, fill);
-    };
+    };useFunc(exports.trianglePointGeometry);
 }));

@@ -5,6 +5,14 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0005
+- renamed triangleGeometry to trianglePointGeometry
+- added trapezoidGeometry and ellipseGeometry
+- added Line functions and Text
+- added Geometry assignments
+- added sci.Binary
+- added reverse functions
+
 ### v1.0004
 - added SCI.ringGeometry and SCI.rectRingGeometry
 - copied some sci customs to SCI

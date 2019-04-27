@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0005";
+	var VERSION = "1.0006";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -180,10 +180,6 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.IsUndefined = IsUndefined;
 	function innerHTML(elm, val) {elm.innerHTML = val}
 	exports.innerHTML = innerHTML;
-	function jsonParse(parsable) {return JSON.parse(parsable)}
-	exports.jsonParse = jsonParse;
-	function jsonString(stringable) {return JSON.stringify(stringable)}
-	exports.jsonString = jsonString;
 	function removeClass(elm, cls) {elm.classList.remove(cls)}
 	exports.removeClass = removeClass;
 	function replaceLocation(rep) {location.replace(rep)}
@@ -253,6 +249,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.ERR_THROW = "Uncaught x";
 	exports.ERR_TYPE_ARGUMENTS_UNAVAILABLE="Uncaught TypeError: \'caller\', \'callee\', and \'arguments\' properties may not be "+
 	    "accessed on strict mode functions or the arguments objects for calls to them";
+	exports.ERR_TYPE_EXECUTE_FAILED_ITERATOR = "Failed to execute x on y: Iterator getter is not callable.";
 	exports.ERR_TYPE_ILLEGAL_INVOCATION = "Uncaught TypeError: Illegal invocation";
 	exports.ERR_TYPE_NOTFUNCTION = "Uncaught TypeError: x is not a function";
 	exports.ERR_TYPE_NUM_UNCREATABLE_PROP = "Uncaught TypeError: Cannot create property x on number y";
@@ -352,7 +349,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.IsFunction = function(arg) {return typeof arg === "function"};
 	exports.IsInteger = function(n) {return Number.isInteger(n)};
 	exports.IsObject = function(arg) {return typeof arg === "object"};
-	exports.IsOnCapsLock = function(input, keyevt) {
+	exports.IsOnCapsLock = function(input, keyevt) { //beta
 		input.addEventListener(keyevt, function(event) {if (event.getModifierState("CapsLock")) {return true} else {return false}})
 	};
 	exports.IsPerfectWhole = function(n, exp) {var m=n**(1/exp);return Math.round(m)==m};
@@ -553,6 +550,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
 	exports.docBody = document.body;
 	exports.docBodyStyle = document.body.style;
+	exports.execute = function(func) {
+		if (exports.IsFunction(func)) {return func();}
+		else {return func;}
+	};
 	exports.factorial = function(n) {
 		if (n==0) {return 1}
 		if (n<0) {console.error("sci.factorial: unexpected Math error");return undefined}
@@ -778,6 +779,12 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.objAssign = function(target, src) {Object.assign(target, src);return target};
     exports.objFreeze = function(obj, x) {obj.freeze(x);return obj};
     exports.objIs = function(obj, v1, v2) {return obj.is(v1, v2)};
+    exports.object = {
+    	assign: Object.assign,
+    	create: Object.create,
+    	defineProp: Object.defineProperty,
+    	defineProps: Object.defineProperties
+    };
 	exports.operators = {
 		//NOTE: some operators don't work or don't fully function, so just be off with it.
 		and: function(a, b) {return a & b},
@@ -1002,7 +1009,11 @@ sci.otherMath = { //realities?
 	exports.rotate = function(ctx, angle) {ctx.rotate(angle)};
 	exports.reqFrame = function(func) {requestAnimationFrame(func)};
 	exports.drawVertices = function(ctx, vertices, stroke, fill) { //dependent
+		this.ctx = ctx;
 		var x, y;
+		this.vertices = vertices;
+		this.stroke = stroke;
+		this.fill = fill;
 		ctx.beginPath();
 		ctx.moveTo(vertices[0], vertices[1]);
 		for (var i=2; i<vertices.length; i+=2) {
@@ -1016,23 +1027,26 @@ sci.otherMath = { //realities?
 	};useFunc(exports.drawVertices);
 
     //text
-    exports.text = function(ctx, point, text, font, fillStyle, maxWidth) {
+    exports.text = function(ctx, point, text, font, maxWidth, strokeStyle, fillStyle) {
+    	this.ctx = ctx;
     	ctx.font = font || "20px Georgia";
-    	ctx.fillStyle = fillStyle || "black";
-    	var t = text || "Hello World!";
-    	var p = point || {x: 100, y: 100};
-    	ctx.fillText(t, p.x, p.y, maxWidth);
+    	this.t = text || "Hello World!";
+    	this.p = point || {x: 100, y: 100};
+    	this.stroke = strokeStyle;
+		this.fill = fillStyle;
+    	if (fillStyle !== undefined || fillStyle !== null) {ctx.fillStyle = fillStyle || "black";ctx.fillText(this.t, this.p.x, this.p.y, maxWidth)}
+    	else if (strokeStyle !== undefined || strokeStyle !== null) {ctx.strokeStyle = strokeStyle || "black";ctx.strokeText(this.t, this.p.x, this.p.y, maxWidth)}
     };useFunc(exports.text);
 
     //lines
-    exports.basicLine = function(ctx, startVertices, endVertices, stroke, fill) {
-    	var s = startVertices || {x: 100, y: 100}; var e = endVertices || {x: 200, y: 200};
-    	var vertices = [s.x, s.y, e.x, e.y];
-    	exports.drawVertices(ctx, vertices, stroke, fill);
-    };useFunc(exports.basicLine);
     exports.dashedLine = function(ctx, Vertices, segments, stroke, fill) {
+    	this.ctx = ctx;
     	var vertices = Vertices || [100, 100, 100, 300];
     	var s = segments || [5, 15];
+    	this.stroke = stroke;
+		this.fill = fill;
+		this.s = s; this.vertices = vertices;
+    	var x, y;
     	ctx.beginPath();
 		ctx.setLineDash(s);
 		ctx.moveTo(vertices[0], vertices[1]);
@@ -1042,99 +1056,143 @@ sci.otherMath = { //realities?
 		}
 		ctx.strokeStyle = stroke || "black";
 		ctx.stroke();
+		ctx.setLineDash([]);
 		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
 		else {ctx.closePath()}
     };useFunc(exports.dashedLine);
 
     //geometry assignments and other flips
-    exports.isPointInPath = function(ctx, x, y) {return ctx.isPointInPath(x, y)};
+    exports.drawImage = function(ctx, img, x, y) {ctx.drawImage(img, x, y)};
+    //see circle example in https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
+    exports.isPointInPath = function(ctx, path, x, y, fillRule) {return ctx.isPointInPath(path, x, y, fillRule)};
+    exports.newPath2D = function() {return new Path2D()};
     function useFunc(func) {
     	func.mainType = "Geometry";
     	Object.assign(func, {
+    		accessSci: function() {return sci},
+    		getCtx: function() {return this.ctx},
     		getDetails: function() {return func},
     		getDetailsString: function() {return "" + func},
     		getLength: function() {return func.length},
     		getMainType: function() {return func.mainType}
     	});
+    	func.prototype.constructor = SCI.prototype;
     };
 
     //geometries
     exports.arcGeometry = function(ctx, center, radius, startAngle, endAngle, isCounter, stroke, fill) {
-    	var r = radius || 10;
-    	var sA = startAngle || 0;
-    	var eA = endAngle || Math.PI;
-    	var c = center || {x: 100, y: 100};
+    	this.ctx = ctx;
+    	this.r = radius || 10;
+    	this.sA = startAngle || 0;
+    	this.eA = endAngle || Math.PI;
+    	this.c = center || {x: 100, y: 100};
+    	this.stroke = stroke;
+		this.fill = fill;
     	ctx.beginPath();
-    	ctx.arc(c.x, c.y, r, sA, eA, isCounter);
+    	ctx.arc(this.c.x, this.c.y, this.r, this.sA, this.eA, isCounter);
     	ctx.strokeStyle = stroke || "black";
 		ctx.stroke();
 		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.arcGeometry);
     exports.circleGeometry = function(ctx, center, radius, stroke, fill) {
-    	var e = 2 * Math.PI;
-    	exports.arcGeometry(ctx, center, radius, 0, e, false, stroke, fill);
+    	this.ctx = ctx;
+    	this.e = 2 * Math.PI;
+    	this.c = center || {x: 100, y: 100};
+    	this.r = radius || 10;
+    	this.stroke = stroke;
+		this.fill = fill;
+    	exports.arcGeometry(ctx, this.c, this.r, 0, this.e, false, stroke, fill);
     };useFunc(exports.circleGeometry);
     exports.ellipseGeometry = function(ctx, center, radiusX, radiusY, rotation, startAngle, endAngle, isCounter, stroke, fill) {
+    	this.ctx = ctx;
     	ctx.beginPath();
-    	var c = center || {x: 100, y: 100};
-    	ctx.ellipse(c.x, c.y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter);
+    	this.c = center || {x: 100, y: 100};
+    	this.rx = radiusX || 10; this.ry = radiusY || 15;
+    	this.rot = rotation || 0;
+    	this.sA = startAngle || 0; this.eA = endAngle || (2 * Math.PI);
+    	this.stroke = stroke;
+		this.fill = fill;
+    	ctx.ellipse(this.c.x, this.c.y, this.rx, this.ry, this.rot, this.sA, this.eA, isCounter);
     	ctx.strokeStyle = stroke || "black";
     	ctx.stroke();
 		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.ellipseGeometry);
     exports.rectGeometry = function(ctx, center, distanceX, distanceY, stroke, fill) {
+    	this.ctx = ctx;
     	if (distanceX === distanceY) {exports.squareGeometry(ctx, center, distanceX, stroke, fill)}
     	else {
     		var dx = distanceX || 10;
     		var dy = distanceY || 20;
     		var c = center || {x: 100, y:100};
-    		var vertices = [
+    		this.dx = dx; this.dy = dy;
+    		this.c = c;
+    		this.stroke = stroke; this.fill = fill;
+    		this.vertices = [
     		    c.x-dx, c.y-dy, //top left
     		    c.x+dx, c.y-dy, //top right
     		    c.x+dx, c.y+dy, //bottom right
     		    c.x-dx, c.y+dy, //bottom left
     		    c.x-dx, c.y-dy  //top left again
     		];
-    		exports.drawVertices(ctx, vertices, stroke, fill);
+    		exports.drawVertices(ctx, this.vertices, stroke, fill);
     	}
     };useFunc(exports.rectGeometry);
     exports.rectRingGeometry = function(ctx, center, distanceX1, distanceX2, distanceY1, distanceY2, stroke1, stroke2, fill1, fill2) {
+    	this.ctx = ctx;
     	var dx1 = distanceX1 || 10; var dx2 = distanceX2 || 5;
     	var dy1 = distanceY1 || 20; var dy2 = distanceY2 || 10;
     	var c = center || {x: 100, y:100};
-    	var vertices1 = [
+    	this.dx1 = dx1; this.dx2 = dx2;
+    	this.dy1 = dy1; this.dy2 = dy2;
+    	this.stroke1 = stroke1;
+		this.fill1 = fill1;
+		this.stroke2 = stroke2;
+		this.fill2 = fill2;
+    	this.c = c;
+    	this.vertices1 = [
     		c.x-dx1, c.y-dy1, //top left
     		c.x+dx1, c.y-dy1, //top right
     		c.x+dx1, c.y+dy1, //bottom right
     		c.x-dx1, c.y+dy1, //bottom left
     		c.x-dx1, c.y-dy1  //top left again
     	];
-    	exports.drawVertices(ctx, vertices1, stroke1, fill1);
-    	var vertices2 = [
+    	exports.drawVertices(ctx, this.vertices1, stroke1, fill1);
+    	this.vertices2 = [
     		c.x-dx2, c.y-dy2, //top left
     		c.x+dx2, c.y-dy2, //top right
     		c.x+dx2, c.y+dy2, //bottom right
     		c.x-dx2, c.y+dy2, //bottom left
     		c.x-dx2, c.y-dy2  //top left again
     	];
-    	exports.drawVertices(ctx, vertices2, stroke2, fill2);
+    	exports.drawVertices(ctx, this.vertices2, stroke2, fill2);
     };useFunc(exports.rectRingGeometry);
     exports.rightTriangleGeometry = function(ctx, rightPoint, distanceX, distanceY, stroke, fill) { //rightPoint at 90deg
+    	this.ctx = ctx;
     	var c = rightPoint || {x: 100, y: 100};
     	var dx = distanceX || 10; var dy = distanceY || -10;
-    	var vertices = [
+    	this.c = c; this.dx = dx; this.dy = dy;
+    	this.stroke = stroke;
+		this.fill = fill;
+    	this.vertices = [
     	    c.x, c.y,    //rightPoint
     	    c.x+dx, c.y, //horizontal
     	    c.x, c.y+dy, //vertical
     	    c.x, c.y     //rightPoint again
     	];
-    	exports.drawVertices(ctx, vertices, stroke, fill);
+    	exports.drawVertices(ctx, this.vertices, stroke, fill);
     };useFunc(exports.rightTriangleGeometry);
     exports.ringGeometry = function(ctx, center, rad1, rad2, stroke1, stroke2, fill1, fill2) {
+    	this.ctx = ctx;
     	var r1 = rad1 || 10; var r2 = rad2 || 5;
     	var c = center || {x: 100, y: 100};
+    	this.r1 = r1; this.r2 = r2;
+    	this.c = c;
+    	this.stroke1 = stroke1;
+		this.fill1 = fill1;
+		this.stroke2 = stroke2;
+		this.fill2 = fill2;
     	ctx.beginPath();
     	ctx.arc(c.x, c.y, r1, 0, 2 * Math.PI, false);
     	ctx.strokeStyle = stroke1 || "black";
@@ -1149,47 +1207,53 @@ sci.otherMath = { //realities?
 		if (fill2 !== undefined) {ctx.fillStyle=fill2;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.ringGeometry);
-    exports.starGeometry = function(ctx, point, stroke, fill) {
-    	var c = point || {x: 100, y: 100};
-    	var vertices = [
-    	    c.x, c.y,
-    	    c.x, c.y
-    	];
-    };useFunc(exports.starGeometry);
     exports.squareGeometry = function(ctx, center, distance, stroke, fill) { //center for c.x, c.y
+    	this.ctx = ctx;
     	var d = distance || 10;
     	var c = center || {x: 100, y:100};
-    	var vertices = [
+    	this.d = d; this.c = c;
+    	this.stroke = stroke;
+		this.fill = fill;
+    	this.vertices = [
     	    c.x-d, c.y-d, //top left
     	    c.x+d, c.y-d, //top right
     	    c.x+d, c.y+d, //bottom right
     	    c.x-d, c.y+d, //bottom left
     	    c.x-d, c.y-d  //top left again
     	];
-    	exports.drawVertices(ctx, vertices, stroke, fill);
+    	exports.drawVertices(ctx, this.vertices, stroke, fill);
     };useFunc(exports.squareGeometry);
     exports.trapezoidGeometry = function(ctx, center, base1, base2, height, stroke, fill) {
+    	this.ctx = ctx;
     	var c = center || {x: 100, y:100};
     	var b1 = base1 || 17; var b2 = base2 || 10;
     	var h = height || 7;
-    	var vertices = [
+    	this.c = c; this.b1 = b1; this.b2 = b2;
+    	this.h = h;
+    	this.stroke = stroke;
+		this.fill = fill;
+    	this.vertices = [
     	    c.x-(b1/2), c.y+(h/2), //tl
     	    c.x+(b1/2), c.y+(h/2), //tr
     	    c.x+(b2/2), c.y-(h/2), //br
     	    c.x-(b2/2), c.y-(h/2), //bl
     	    c.x-(b1/2), c.y+(h/2)
     	];
-    	exports.drawVertices(ctx, vertices, stroke, fill);
+    	exports.drawVertices(ctx, this.vertices, stroke, fill);
     };useFunc(exports.trapezoidGeometry);
     exports.trianglePointGeometry = function(ctx, point, distanceX, distanceY, stroke, fill) {
+    	this.ctx = ctx;
     	var c = point || {x: 100, y: 100};
     	var dx = distanceX || 7; var dy = distanceY || 10;
-    	var vertices = [
+    	this.c = c; this.dx = dx; this.dy = dy;
+    	this.stroke = stroke;
+		this.fill = fill;
+    	this.vertices = [
     	    c.x, c.y,
     	    c.x, c.y+dy,
     	    c.x+dx, c.y+(dy/2),
     	    c.x, c.y
     	];
-    	exports.drawVertices(ctx, vertices, stroke, fill);
+    	exports.drawVertices(ctx, this.vertices, stroke, fill);
     };useFunc(exports.trianglePointGeometry);
 }));

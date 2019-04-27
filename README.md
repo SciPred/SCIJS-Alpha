@@ -5,6 +5,19 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0006
+- added .execute to execute functions even without brackets or arguments (simple, right?)
+- removed basicLine because it was too easy; to make up for it I edited SCI.text so it allows stroke.
+- removed 2 JSON functions
+- added a comment (...)
+- couldn't continue starGeometry :(
+- added/edited var to this (i.e. "var c" to "this.c")
+- edited isPointInPath :(
+- added getCtx in geometry functions
+- fixed dashedLine continuous dash problem
+- added newPath2D
+- added sci.object
+
 ### v1.0005
 - renamed triangleGeometry to trianglePointGeometry
 - added trapezoidGeometry and ellipseGeometry

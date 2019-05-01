@@ -5,6 +5,12 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0007
+- SCI was renamed Scanvas
+- edited a few more this functions
+- edited first comment
+- added new file: SCI2D! Now you can make polygons and stuff
+
 ### v1.0006
 - added .execute to execute functions even without brackets or arguments (simple, right?)
 - removed basicLine because it was too easy; to make up for it I edited SCI.text so it allows stroke.

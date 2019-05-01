@@ -1,4 +1,4 @@
-/* SciJS Main Alpha: SCI
+/* SciJS Main Alpha: sci and Scanvas
  * By SciPred, made 2019
  * Free To Use.
 */
@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0006";
+	var VERSION = "1.0007";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -988,11 +988,11 @@ sci.otherMath = { //realities?
 };
 
 
-//SCI for canvases
+//Scanvas for canvases
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.SCI = function(arg) {return arg}));
+	(global = global || self, factory(global.Scanvas = function(arg) {return arg}));
 }(this, function (exports) {
 	var DEG = Math.PI / 180;
 	exports.VERSION = sci.VERSION;
@@ -1011,41 +1011,43 @@ sci.otherMath = { //realities?
 	exports.drawVertices = function(ctx, vertices, stroke, fill) { //dependent
 		this.ctx = ctx;
 		var x, y;
-		this.vertices = vertices;
-		this.stroke = stroke;
-		this.fill = fill;
+		this.vertices = vertices || [100, 100];
+		this.stroke = stroke || "black";
+		this.fill = fill || "black";
 		ctx.beginPath();
-		ctx.moveTo(vertices[0], vertices[1]);
-		for (var i=2; i<vertices.length; i+=2) {
-			x = vertices[i]; y = vertices[i+1];
+		ctx.moveTo(this.vertices[0], this.vertices[1]);
+		for (var i=2; i<this.vertices.length; i+=2) {
+			x = this.vertices[i]; y = this.vertices[i+1];
 			ctx.lineTo(x, y);
 		}
-		ctx.strokeStyle = stroke || "black";
+		ctx.strokeStyle = this.stroke || "black";
 		ctx.stroke();
-		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		if (fill !== undefined) {ctx.fillStyle=this.fill;ctx.fill()}
 		else {ctx.closePath()}
 	};useFunc(exports.drawVertices);
 
     //text
-    exports.text = function(ctx, point, text, font, maxWidth, strokeStyle, fillStyle) {
+    exports.text = function(ctx, point, text, font, maxWidth, stroke, fill) {
     	this.ctx = ctx;
-    	ctx.font = font || "20px Georgia";
+    	this.font = font;
+    	ctx.font = this.font || "20px Georgia";
     	this.t = text || "Hello World!";
-    	this.p = point || {x: 100, y: 100};
-    	this.stroke = strokeStyle;
-		this.fill = fillStyle;
-    	if (fillStyle !== undefined || fillStyle !== null) {ctx.fillStyle = fillStyle || "black";ctx.fillText(this.t, this.p.x, this.p.y, maxWidth)}
-    	else if (strokeStyle !== undefined || strokeStyle !== null) {ctx.strokeStyle = strokeStyle || "black";ctx.strokeText(this.t, this.p.x, this.p.y, maxWidth)}
+    	this.point = point || {x: 100, y: 100};
+    	this.stroke = stroke || "black";
+		this.fill = fill || "black";
+		this.maxWidth = maxWidth || 200;
+    	if (fill !== undefined) {ctx.fillStyle = fill || "black";ctx.fillText(this.t, this.point.x, this.point.y, maxWidth)}
+    	else if (stroke !== undefined) {ctx.strokeStyle = stroke || "black";ctx.strokeText(this.t, this.point.x, this.point.y, maxWidth)}
     };useFunc(exports.text);
 
     //lines
     exports.dashedLine = function(ctx, Vertices, segments, stroke, fill) {
     	this.ctx = ctx;
-    	var vertices = Vertices || [100, 100, 100, 300];
-    	var s = segments || [5, 15];
+    	this.vertices = Vertices || [100, 100, 100, 300];
+    	this.segments = segments || [5, 15];
     	this.stroke = stroke;
 		this.fill = fill;
-		this.s = s; this.vertices = vertices;
+		var s = this.segments; var vertices = this.vertices;
     	var x, y;
     	ctx.beginPath();
 		ctx.setLineDash(s);
@@ -1054,10 +1056,10 @@ sci.otherMath = { //realities?
 			x = vertices[i]; y = vertices[i+1];
 			ctx.lineTo(x, y);
 		}
-		ctx.strokeStyle = stroke || "black";
+		ctx.strokeStyle = this.stroke || "black";
 		ctx.stroke();
 		ctx.setLineDash([]);
-		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		if (fill !== undefined) {ctx.fillStyle=this.fill;ctx.fill()}
 		else {ctx.closePath()}
     };useFunc(exports.dashedLine);
 
@@ -1074,9 +1076,13 @@ sci.otherMath = { //realities?
     		getDetails: function() {return func},
     		getDetailsString: function() {return "" + func},
     		getLength: function() {return func.length},
-    		getMainType: function() {return func.mainType}
+    		getMainType: function() {return func.mainType},
+    		setVertices: function(vertices) {
+    			if (this.vertices == undefined) {console.warn("Scanvas: no vertices found");return this}
+    			else {this.vertices = vertices || [100, 100];return this}
+    		}
     	});
-    	func.prototype.constructor = SCI.prototype;
+    	func.prototype.constructor = Scanvas.prototype;
     };
 
     //geometries
@@ -1088,11 +1094,12 @@ sci.otherMath = { //realities?
     	this.c = center || {x: 100, y: 100};
     	this.stroke = stroke;
 		this.fill = fill;
+		this.isCounter = isCounter || false;
     	ctx.beginPath();
-    	ctx.arc(this.c.x, this.c.y, this.r, this.sA, this.eA, isCounter);
-    	ctx.strokeStyle = stroke || "black";
+    	ctx.arc(this.c.x, this.c.y, this.r, this.sA, this.eA, this.isCounter);
+    	ctx.strokeStyle = this.stroke || "black";
 		ctx.stroke();
-		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		if (fill !== undefined) {ctx.fillStyle=this.fill;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.arcGeometry);
     exports.circleGeometry = function(ctx, center, radius, stroke, fill) {
@@ -1102,7 +1109,7 @@ sci.otherMath = { //realities?
     	this.r = radius || 10;
     	this.stroke = stroke;
 		this.fill = fill;
-    	exports.arcGeometry(ctx, this.c, this.r, 0, this.e, false, stroke, fill);
+    	exports.arcGeometry(this.ctx, this.c, this.r, 0, this.e, false, this.stroke, this.fill);
     };useFunc(exports.circleGeometry);
     exports.ellipseGeometry = function(ctx, center, radiusX, radiusY, rotation, startAngle, endAngle, isCounter, stroke, fill) {
     	this.ctx = ctx;
@@ -1113,10 +1120,11 @@ sci.otherMath = { //realities?
     	this.sA = startAngle || 0; this.eA = endAngle || (2 * Math.PI);
     	this.stroke = stroke;
 		this.fill = fill;
-    	ctx.ellipse(this.c.x, this.c.y, this.rx, this.ry, this.rot, this.sA, this.eA, isCounter);
-    	ctx.strokeStyle = stroke || "black";
+		this.isCounter = isCounter || false;
+    	ctx.ellipse(this.c.x, this.c.y, this.rx, this.ry, this.rot, this.sA, this.eA, this.isCounter);
+    	ctx.strokeStyle = this.stroke || "black";
     	ctx.stroke();
-		if (fill !== undefined) {ctx.fillStyle=fill;ctx.fill()}
+		if (fill !== undefined) {ctx.fillStyle=this.fill;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.ellipseGeometry);
     exports.rectGeometry = function(ctx, center, distanceX, distanceY, stroke, fill) {
@@ -1136,7 +1144,7 @@ sci.otherMath = { //realities?
     		    c.x-dx, c.y+dy, //bottom left
     		    c.x-dx, c.y-dy  //top left again
     		];
-    		exports.drawVertices(ctx, this.vertices, stroke, fill);
+    		exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     	}
     };useFunc(exports.rectGeometry);
     exports.rectRingGeometry = function(ctx, center, distanceX1, distanceX2, distanceY1, distanceY2, stroke1, stroke2, fill1, fill2) {
@@ -1158,7 +1166,7 @@ sci.otherMath = { //realities?
     		c.x-dx1, c.y+dy1, //bottom left
     		c.x-dx1, c.y-dy1  //top left again
     	];
-    	exports.drawVertices(ctx, this.vertices1, stroke1, fill1);
+    	exports.drawVertices(this.ctx, this.vertices1, this.stroke1, this.fill1);
     	this.vertices2 = [
     		c.x-dx2, c.y-dy2, //top left
     		c.x+dx2, c.y-dy2, //top right
@@ -1166,7 +1174,7 @@ sci.otherMath = { //realities?
     		c.x-dx2, c.y+dy2, //bottom left
     		c.x-dx2, c.y-dy2  //top left again
     	];
-    	exports.drawVertices(ctx, this.vertices2, stroke2, fill2);
+    	exports.drawVertices(this.ctx, this.vertices2, this.stroke2, this.fill2);
     };useFunc(exports.rectRingGeometry);
     exports.rightTriangleGeometry = function(ctx, rightPoint, distanceX, distanceY, stroke, fill) { //rightPoint at 90deg
     	this.ctx = ctx;
@@ -1181,7 +1189,7 @@ sci.otherMath = { //realities?
     	    c.x, c.y+dy, //vertical
     	    c.x, c.y     //rightPoint again
     	];
-    	exports.drawVertices(ctx, this.vertices, stroke, fill);
+    	exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     };useFunc(exports.rightTriangleGeometry);
     exports.ringGeometry = function(ctx, center, rad1, rad2, stroke1, stroke2, fill1, fill2) {
     	this.ctx = ctx;
@@ -1195,16 +1203,16 @@ sci.otherMath = { //realities?
 		this.fill2 = fill2;
     	ctx.beginPath();
     	ctx.arc(c.x, c.y, r1, 0, 2 * Math.PI, false);
-    	ctx.strokeStyle = stroke1 || "black";
+    	ctx.strokeStyle = this.stroke1 || "black";
 		ctx.stroke();
-		if (fill1 !== undefined) {ctx.fillStyle=fill1;ctx.fill()}
+		if (fill1 !== undefined) {ctx.fillStyle=this.fill1;ctx.fill()}
     	else {ctx.closePath()}
 
     	ctx.beginPath();
         ctx.arc(c.x, c.y, r2, 0, 2 * Math.PI, false);
-    	ctx.strokeStyle = stroke2 || "black";
+    	ctx.strokeStyle = this.stroke2 || "black";
 		ctx.stroke();
-		if (fill2 !== undefined) {ctx.fillStyle=fill2;ctx.fill()}
+		if (fill2 !== undefined) {ctx.fillStyle=this.fill2;ctx.fill()}
     	else {ctx.closePath()}
     };useFunc(exports.ringGeometry);
     exports.squareGeometry = function(ctx, center, distance, stroke, fill) { //center for c.x, c.y
@@ -1221,7 +1229,7 @@ sci.otherMath = { //realities?
     	    c.x-d, c.y+d, //bottom left
     	    c.x-d, c.y-d  //top left again
     	];
-    	exports.drawVertices(ctx, this.vertices, stroke, fill);
+    	exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     };useFunc(exports.squareGeometry);
     exports.trapezoidGeometry = function(ctx, center, base1, base2, height, stroke, fill) {
     	this.ctx = ctx;
@@ -1239,7 +1247,7 @@ sci.otherMath = { //realities?
     	    c.x-(b2/2), c.y-(h/2), //bl
     	    c.x-(b1/2), c.y+(h/2)
     	];
-    	exports.drawVertices(ctx, this.vertices, stroke, fill);
+    	exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     };useFunc(exports.trapezoidGeometry);
     exports.trianglePointGeometry = function(ctx, point, distanceX, distanceY, stroke, fill) {
     	this.ctx = ctx;
@@ -1254,6 +1262,6 @@ sci.otherMath = { //realities?
     	    c.x+dx, c.y+(dy/2),
     	    c.x, c.y
     	];
-    	exports.drawVertices(ctx, this.vertices, stroke, fill);
+    	exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     };useFunc(exports.trianglePointGeometry);
 }));

@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0007";
+	var VERSION = "1.0008";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -338,6 +338,14 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		},
 		reverseString: function(str) {exports.reverseString(str)}
 	};
+	exports.Element = {
+		body: document.body || "unavailable",
+		bodyStyle: document.body.style || "unavailable",
+		docDefaultView: document.defaultView || window,
+		style: function(elmstyle, value) {elmstyle = value},
+		styleSheets: function() {return document.styleSheets},
+		styleSheetsAdopted: function() {return document.adoptedStyleSheets}
+	};
 	exports.HasConsole = function() {return typeof console !== "undefined"};
 	exports.HasDocumentBody = function() {return document.body !== undefined};
 	exports.HasWebWorker = function() {return typeof Worker !== undefined};
@@ -548,8 +556,6 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     };
     exports.data.variance = function(values){var sd=exports.data.standardDeviation(values);return sd**2;};
 	exports.dir = function(data, isXML) {if (isXML) {console.dirxml(data)} else {console.dir(data)}};
-	exports.docBody = document.body;
-	exports.docBodyStyle = document.body.style;
 	exports.execute = function(func) {
 		if (exports.IsFunction(func)) {return func();}
 		else {return func;}
@@ -832,6 +838,8 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     };
     exports.reverseString = function(str) {return str.split("").reverse().join("")};
 	exports.rot3d = function(elm, x, y, z, angle) {elm.style.transform = "rotate3d("+x+","+y+","+z+","+angle+")"};
+	exports.setInterval = function(func, seconds) {var x = setInterval(func, seconds*1000);return x};
+	exports.setTimeout = function(func, seconds) {var x = setTimeout(func, seconds*1000);return x};
 	exports.slideshow = function (sel, ms, func) {var i, ss, x = sci.getElements(sel), l = x.length;ss = {};ss.current = 1;ss.x = x;ss.ondisplaychange = func;
         if (!isNaN(ms) || ms == 0) {
             ss.milliseconds = ms;
@@ -886,6 +894,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.temp.toNewton = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.33};
     exports.temp.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
     exports.temp.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
+    exports.toggleBoolean = function(bool) {
+    	if (bool) {bool = false;return bool}
+    	else {bool = true;return bool}
+    };
 	exports.toggleClassElement = function (element, c1, c2) {
         var t1, t2, t1Arr, t2Arr, j, arr, allPresent;
         t1 = (c1 || "");
@@ -985,6 +997,13 @@ sci.otherMath = { //realities?
     maxRangeOfCannonAt45deg: function(v, g) {return (v*v)/g},
     noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)},
     permutations: function(n, r) {return sci.factorial(n)/sci.factorial(n-r)},
+    rotateVertex: function(vertex, angle) {
+    	var x = vertex.x, y = vertex.y, a = angle || 45;
+    	var cos = Math.cos(a), sin = Math.sin(a);
+		vertex.x = (x * cos) - (y * sin);
+		vertex.y = (x * sin) + (y * cos);
+		return vertex;
+    }
 };
 
 

@@ -5,6 +5,15 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0008
+- split SCI2D into SCI2DBeta and SCI2D
+- you can do lots of things in SCI2D! .loop, Scene, Vector, etc.
+- added sci.Element
+- replaced docBody and docBodyStyle in Element
+- added setTimeout and setInterval: in seconds!
+- added toggleBoolean
+- added otherMath.rotateVertex
+
 ### v1.0007
 - SCI was renamed Scanvas
 - edited a few more this functions

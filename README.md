@@ -5,6 +5,35 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0009 (MAJOR ADDITION UPDATE I)
+- tweaked a bit of SCI2D.Scene.add
+- added sci.getCtx()
+- added sci.throw()
+- added Error: full of Error functions!
+- added SCI2D.isPointInPath()
+- added SCI2D move functions
+- added SCI2D geometry movement vectors
+- added SCI2D geometry getDash()
+- tweaked console messages
+- added warning for sci.getPrototype()
+- added prototype stuff
+- added constructor stuff
+- added a few SCI2D function tweaks
+- added self and parent
+- added Variables
+- tweaked isOnCapsLock so it depends on the document, not by the given input, and it will not add a bunch of EventListeners
+- tweaked SCI2D.Vector.rotateMatrix
+- added SCI2D.getArcEnd
+- added sci._IS_THING_OK
+- added more SCI2D.Vector functions
+- added sci.addSciContext2DFunctions! Now you can add more custom functions to your specific CanvasRenderingContext2D! :)
+- added a lot more functions... but removed isOnCapsLock
+- still don't know how to fix Geometry.rotateVertices :(
+- planning to add SCI3D... soon
+Note about sci.addSciContext2DFunctions: I thought the current ctx functions were not enough, so I added more.
+If ctx is undefined, it puts the functions in window.CanvasRenderingContext2D.prototype, so whenever a context is made, the functions are there!
+Some functions include linesTo, polygon, circle, fillArc, strokeEllipse, color, etc.
+
 ### v1.0008
 - split SCI2D into SCI2DBeta and SCI2D
 - you can do lots of things in SCI2D! .loop, Scene, Vector, etc.

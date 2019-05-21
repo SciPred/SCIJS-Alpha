@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0008";
+	var VERSION = "1.0009";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -263,7 +263,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			}
 		},
 		retrieveFromLocalStorage: function() {
-			if (localStorage.sci !== exports) {
+			if (localStorage.sci !== exports && localStorage.sci !== {}) {
 				if (confirm("WARNING: the current localStorage.sci value is either not a sci variable or an older version.\nWould you like to continue?")) {
 					exports = localStorage.sci;
 				}
@@ -293,7 +293,34 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	    	removeSci: function() {window.sci = undefined;alert("SCI IS NOW UNUSABLE")}
 	    }
 	};
-	exports.__SETTINGS__.toggleSciInDocument.NOTE = function() {console.warn("This only handles with the document, not the window.")};
+	exports.__SETTINGS__.toggleSciInDocument.NOTE = function() {console.warn("sci.__SETTINGS__.toggleSciInDocument: This only handles with the document, not the window.")};
+	//prototype and extra stuff
+	exports.prototype = exports.constructor.prototype;
+	exports.prototype.mainHandler = window || "unavailable";
+	exports.prototype.SCI_SETTINGS_DANGER_HANDLER = exports.__SETTINGS__._DangerSettings_;
+	exports.prototype.string = exports.prototype.constructor.string = exports.constructor.string = "sci";
+	exports.prototype.consTrace = function() {return console.trace()};
+	exports.constructor.DANGER = {delete: exports.__SETTINGS__._DangerSettings_.removeSci || "unavailable"};
+	exports.protocons = exports.prototype.constructor || "unavailable";
+	exports.consproto = exports.constructor.prototype || "unavailable";
+	exports.prototype.documentHandler = document || "unavailable";
+	exports.self = exports.parent = exports;
+	exports._INFORMATION = exports.prototype._INFORMATION = function() {
+		if (typeof console === undefined) {
+			alert("Sorry, but console is not supported. Please try again on a different browser.");
+		} else {
+			console.log("__INFORMATION__");
+			console.log("SCIJS by SciPred");
+			console.dir("Version " + exports.VERSION);
+			console.dir("Free To Use, but copyrighted.");
+			console.log("LOG: sci");
+			console.log(sci);
+		}
+	};
+	//only once
+	exports._IS_CONSOLE_OK = typeof console === undefined ? false : true;
+	exports._IS_DOCUMENT_OK = typeof document === undefined ? false : true;
+	exports._IS_NAVIGATOR_OK = typeof navigator === undefined ? false : true;
 
 
 
@@ -338,6 +365,20 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		},
 		reverseString: function(str) {exports.reverseString(str)}
 	};
+	exports.ConstructorMainFunctions = {
+		Array: window.Array || "unavailable",
+		Boolean: window.Boolean || "unavailable",
+		Date: window.Date || "unavailable",
+		Error: window.Error || "unavailable",
+		FileReader: window.FileReader || "unavailable",
+		Function: window.Function || "unavailable",
+		Number: window.Number || "unavailable",
+		Object: window.Object || "unavailable",
+		RegExp: window.RegExp || "unavailable",
+		String: window.String || "unavailable",
+		Worker: window.Worker || "unavailable"
+
+	};
 	exports.Element = {
 		body: document.body || "unavailable",
 		bodyStyle: document.body.style || "unavailable",
@@ -346,9 +387,28 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		styleSheets: function() {return document.styleSheets},
 		styleSheetsAdopted: function() {return document.adoptedStyleSheets}
 	};
+	exports.Error = {
+		DOMError: DOMError || "unavailable",
+		Error: Error || "unavailable",
+		EvalError: EvalError || "unavailable",
+		MediaError: MediaError || "unavailable",
+		OverconstrainedError: OverconstrainedError || "unavailable",
+		RangeError: RangeError || "unavailable",
+		ReferenceError: ReferenceError || "unavailable",
+		RTCError: RTCError || "unavailable",
+		SyntaxError: SyntaxError || "unavailable",
+		TypeError: TypeError || "unavailable",
+		URIError: URIError || "unavailable",
+		webkitSpeechRecognitionError: webkitSpeechRecognitionError || "unavailable",
+
+		onerror: document.onerror || window.onerror || "unavailable",
+		onmessageerror: window.onmessageerror || "unavailable",
+		throwError: function(errorType, arg) {throw new errorType(arg)}
+	};
 	exports.HasConsole = function() {return typeof console !== "undefined"};
-	exports.HasDocumentBody = function() {return document.body !== undefined};
-	exports.HasWebWorker = function() {return typeof Worker !== undefined};
+	exports.HasDocumentBody = function() {return document.body !== "undefined"};
+	exports.HasWebWorker = function() {return typeof Worker !== "undefined"};
+	exports.HasWindow = function() {return typeof window !== "undefined"};
 	exports.IsBinaricBoolean = function(arg) {return (arg==0 || arg==1)};
 	exports.IsBoolean = function(arg) {return typeof arg === "boolean"};
 	exports.IsCheckboxChecked = function(checkbox) {return checkbox.checked};
@@ -357,9 +417,6 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.IsFunction = function(arg) {return typeof arg === "function"};
 	exports.IsInteger = function(n) {return Number.isInteger(n)};
 	exports.IsObject = function(arg) {return typeof arg === "object"};
-	exports.IsOnCapsLock = function(input, keyevt) { //beta
-		input.addEventListener(keyevt, function(event) {if (event.getModifierState("CapsLock")) {return true} else {return false}})
-	};
 	exports.IsPerfectWhole = function(n, exp) {var m=n**(1/exp);return Math.round(m)==m};
 	exports.IsSafeInteger = function(int) {return Number.isSafeInteger(int)};
 	exports.IsString = function(arg) {return typeof arg === "string"};
@@ -440,17 +497,114 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.Random.generateRandomSciIDArray = function(len, replacee) {exports.Random.generateRandomArray(len, replacee)};
 	exports.Random.generateRandomString = function(len, replacee, rands) { //rands is last because it might be very long
 		str = "";
-		if(Array.isArray(rands)==false){console.warn("sci.Random: rands is undefined, using randomSciIDVars");rands=exports.Random.randomSciIDVars}
+		if(Array.isArray(rands)==false){console.warn("sci.Random.generateRandomString: rands is undefined, using randomSciIDVars");rands=exports.Random.randomSciIDVars}
 		for (var i=0; i<len; i++) {
 			str = exports.choose(rands);
 		}
 		if (replacee !== undefined) {replacee = str;return replacee} else {return str}
+	};
+	exports.Variables = {
+		JSON: window.JSON || "unavailable",
+		applicationCache: applicationCache || "unavailable",
+		console: console || "unavailable",
+		document: document || "unavailable",
+		localStorage: window.localStorage || "unavailable",
+		location: document.location || "unavailable",
+		memory: console.memory || "unavailable",
+		navigator: navigator || "unavailable",
+		performance: performance || "unavailable",
+		screen: screen || window.screen || "unavailable",
+		scroll: scroll || window.scroll || "unavailable",
+		speechSynthesis: window.speechSynthesis || "unavailable",
+		this: exports,
+		window: window || "unavailable"
 	};
 	exports.addClass = function (sel, name) {exports.addClassElements(getElements(sel), name)};
 	exports.addClassElement = function (element, name) {var i, arr1, arr2;arr1 = element.className.split(" ");arr2 = name.split(" ");
         for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
     };
     exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
+	exports.addSciContext2DFunctions = function(ctx) { //capitals come first
+		ctx = ctx || window.CanvasRenderingContext2D.prototype;
+		//customs
+		ctx.IsCtx = true;
+		ctx.Is2D = true;
+
+		ctx.Fill = function() { //still a test
+			if (ctx.fillStyle === null) {ctx.closePath()}
+			else {ctx.fill()}
+		}
+
+		ctx.circle = function(x, y, radius) {
+			ctx.arc(x, y, radius, 0, 2 * Math.PI);
+		};
+		ctx.color = function() {
+			ctx.stroke();
+			ctx.fill();
+		};
+		ctx.emptyStyles = function() {
+			ctx.strokeStyle = "#000000";
+			ctx.fillStyle = "#000000";
+			return ctx;
+		};
+		ctx.fillArc = function(x, y, radius, startAngle, endAngle, isCounter) {
+			ctx.fillEllipse(x, y, radius, radius, 0, startAngle, endAngle, isCounter);
+		};
+		ctx.fillCircle = function(x, y, radius) {
+			ctx.fillArc(x, y, radius, 0, 2 * Math.PI);
+		};
+		ctx.fillEllipse = function(x, y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter) {
+			ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter);
+			ctx.fill();
+		};
+		ctx.fillOctagon = function(x, y, size) {
+			ctx.octagon(x, y, size);
+			ctx.fill();
+		};
+		ctx.fillPolygon = function(x, y, sides, size) {
+			ctx.polygon(x, y, sides, size);
+			ctx.fill();
+		};
+		ctx.linesTo = function(vertices) { // as array: [x, y, x, y, ...]
+			vertices = vertices || [0, 0];
+			for (var i=0; i<vertices.length; i+=2) {
+				ctx.lineTo(vertices[i], vertices[i+1]);
+			}
+		};
+		ctx.octagon = function(x, y, size) {
+			ctx.polygon(x, y, 8, size);
+		};
+		ctx.polygon = function(x, y, sides, size) {
+			//this function is now the most reliable... for now.
+			var c = {x: x, y: y};
+			var Xcenter = c.x, Ycenter = c.y, numberOfSides = sides || 3;
+			size = size || 10;
+
+			ctx.moveTo(Xcenter+size*Math.cos(0), Ycenter+size*Math.sin(0));
+			for (var i = 1; i <= numberOfSides;i += 1) {
+				ctx.lineTo(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+			}
+		};
+		ctx.strokeArc = function(x, y, radius, startAngle, endAngle, isCounter) {
+			ctx.strokeEllipse(x, y, radius, radius, 0, startAngle, endAngle, isCounter);
+		};
+		ctx.strokeCircle = function(x, y, radius) {
+			ctx.strokeArc(x, y, radius, 0, 2 * Math.PI);
+		};
+		ctx.strokeEllipse = function(x, y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter) {
+			ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, isCounter);
+			ctx.stroke();
+		};
+		ctx.strokeOctagon = function(x, y, size) {
+			ctx.octagon(x, y, size);
+			ctx.stroke();
+		};
+		ctx.strokePolygon = function(x, y, sides, size) {
+			ctx.polygon(x, y, sides, size);
+			ctx.stroke();
+		};
+		return ctx;
+	};
     exports.args = function(arg) {return arg.arguments};
     exports.arithmetic = {
         bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
@@ -468,7 +622,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.array.addItemToEnd = function(arr, item) {arr[arr.length] = item;return arr};
 	exports.array.repeatItem = function(len, items, replacee) {
 		var arr = replacee || [];
-		if (items === undefined) {console.warn("sci.repeatItemArray: items is/are not defined, using empty array");items=[]}
+		if (items === undefined) {console.warn("sci.array.repeatItem: items is/are not defined, using empty array");items=[]}
 		for (var i=0; i<len; i++) {
 			if (items.length==1) {arr[i]=items} else {arr[i] = items[i]}
 		}
@@ -482,7 +636,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	};
     exports.choose = function(arr) {return arr[Math.floor(Math.random()*arr.length)]};
 	exports.clearConsole = function() {console.clear()};
-	exports.click = function(btn) {btn.click()};
+	exports.click = function(btn) {btn.click();return btn};
 	exports.close = function() {document.close()};
 	exports.color = {
 		componentToHex: function(c) {var hex = c.toString(16);return hex.length == 1 ? "0" + hex : hex;},
@@ -527,6 +681,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     	var btn = document.createElement("BUTTON");
     	btn.innerHTML = html;
     	return btn;
+    };
+    exports.createElement = function(type, options) {
+    	var elm = document.createElement(type, options);
+    	return elm;
     };
     exports.createP = function(txt) {
     	var a = document.createElement("P");
@@ -647,12 +805,17 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		normal: function(tag) {return getByTag(tag)},
 		warning: function() {console.warn("sci.getByTagNS: Please note that this may not work in earlier versions, beta versions or other software or apps.")}
 	});
+	exports.getCtx = function(canvas, ctxType, ctxAttributes) {return canvas.getContext(ctxType, ctxAttributes)};
+	exports.getInnerHTML = function(elm) {return elm.innerHTML};
 	exports.getLength = function(obj) {return obj.length};
 	exports.getName = function(obj) {return obj.name};
 	exports.getPrototype = function(obj) {
 		if (obj.prototype !== undefined) {return obj.prototype}
-		else {console.error("sci.getPrototype: obj.prototype is undefined.")}
+		else {console.error("sci.getPrototype: obj.prototype is undefined.");return obj}
 	};
+	Object.assign(exports.getPrototype, {
+		warning: function() {console.warn("sci.getPrototype: I couldn\'t use __proto__ as an alternative due to its deprecated use.")}
+	});
 	exports.getSingleElement = function(id, n) {
 		var i = n || 0;
 		var elm = document.getElementById(id) || document.getElementsByName(id)[i] || 
@@ -721,7 +884,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		power2: function(exp) {return 2**exp}
 	};
 	exports.math.regPol = {
-	    area: function(perimeter, apothem){if(apothem==null){console.error("sci.math: apothem is not defined")}else{return (perimeter*apothem)/2}},
+	    area: function(perimeter, apothem){if(apothem==null){console.error("sci.math.regPol.area: apothem is not defined")}else{return (perimeter*apothem)/2}},
 	    circumference: function(radius){return 2*r*Math.PI},
         perimeter: function(sidenumbers, sidelength){return sidenumbers*sidelength}
     };
@@ -894,6 +1057,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.temp.toNewton = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.33};
     exports.temp.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
     exports.temp.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
+    exports.throw = function(arg) {throw arg};
     exports.toggleBoolean = function(bool) {
     	if (bool) {bool = false;return bool}
     	else {bool = true;return bool}
@@ -974,6 +1138,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.typeOfBeta=function(arg) {return typeof arg};
 	exports.typewriter = function(elm, i, txt, spd) {if (i<txt.length) {elm.innerHTML=txt.charAt(i);i++;setTimeout(typewriter(elm, i, txt, spd), spd)}};
 	exports.undefined = undefined;
+	exports.undefinedTypeof = "undefined";
 	exports.valOf = function(obj) {var o=obj || exports; return o};
 	exports.whatConstructor = function(arg) {return arg.constructor};
 
@@ -997,6 +1162,19 @@ sci.otherMath = { //realities?
     maxRangeOfCannonAt45deg: function(v, g) {return (v*v)/g},
     noughtsAndCrossesWinningLines: function(g) {return 2*(g+1)},
     permutations: function(n, r) {return sci.factorial(n)/sci.factorial(n-r)},
+    powerOfTwoTotal: function(highestPower) {
+    	//this starts at 2**0 (which is 1)
+    	//summing with 1+2+3+...+2**highestPower
+    	//you'd think I'd be using a summation loop or a for() function... but you're wrong :)
+    	//I have my own formula... which works! Well, kinda
+    	if (highestPower < 0) {
+    		console.error("sci.otherMath.powerOfTwoTotal: highestPower must be equal or higher than 0.");
+    		return 1;
+    	}
+    	if (highestPower === 0 || highestPower === undefined) {return 1}
+    	var n = highestPower || 1;
+    	return 2**(n+1) - 1;
+    },
     rotateVertex: function(vertex, angle) {
     	var x = vertex.x, y = vertex.y, a = angle || 45;
     	var cos = Math.cos(a), sin = Math.sin(a);
@@ -1284,3 +1462,4 @@ sci.otherMath = { //realities?
     	exports.drawVertices(this.ctx, this.vertices, this.stroke, this.fill);
     };useFunc(exports.trianglePointGeometry);
 }));
+sci.prototype.canvasHandler = Scanvas || "unavailable";

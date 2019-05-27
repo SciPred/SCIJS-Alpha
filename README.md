@@ -5,6 +5,20 @@ Still trying to update everyday for anyone who sees this :)
 
 ## VERSIONS (for sciMainAlpha.js)
 ---
+### v1.0010 (CANVAS ADDITION UPDATE)
+- added more ctx functions!
+- this update is mainly focused on adding new canvas and context functions... but I still put some more non-ctx functions.
+- added importScript
+- changed sci to sciBeta in sciMainBeta.js
+- renamed ctx.Fill to ctx.close for a new Fill... and Stroke
+- added fromSimple3dTo2d
+- bugs bugs bugs bugs bugs (anyone read this?)
+- added some sci.addSciContext2DFunctions lineTo and moveTo functions
+- Still simple.
+- added new file: sciElements! Still has few functions though.
+- No, I will NOT be putting toCartesianCoordinateY. That's too obvious.
+- still trying SCI3D
+
 ### v1.0009 (MAJOR ADDITION UPDATE I)
 - tweaked a bit of SCI2D.Scene.add
 - added sci.getCtx()

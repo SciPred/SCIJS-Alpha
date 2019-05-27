@@ -9,7 +9,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.sci = function() {alert("THANK YOU FOR USING sciMain.js, YOU MAY NOW PROCEED.")}));
+	(global = global || self, factory(global.sciBeta = function() {alert("THANK YOU FOR USING sciMain.js, YOU MAY NOW PROCEED.")}));
 }(this, function (exports) {'use strict';
 	/* BETA FUNCTIONS (not actually beta but u know what i mean) */
 	//POLYFILLS (in case)

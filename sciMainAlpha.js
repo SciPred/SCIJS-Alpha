@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0009";
+	var VERSION = "1.0010";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -297,7 +297,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	//prototype and extra stuff
 	exports.prototype = exports.constructor.prototype;
 	exports.prototype.mainHandler = window || "unavailable";
-	exports.prototype.SCI_SETTINGS_DANGER_HANDLER = exports.__SETTINGS__._DangerSettings_;
+	exports.SCI_SETTINGS_DANGER_HANDLER = exports.__SETTINGS__._DangerSettings_;
 	exports.prototype.string = exports.prototype.constructor.string = exports.constructor.string = "sci";
 	exports.prototype.consTrace = function() {return console.trace()};
 	exports.constructor.DANGER = {delete: exports.__SETTINGS__._DangerSettings_.removeSci || "unavailable"};
@@ -521,22 +521,30 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	};
 	exports.addClass = function (sel, name) {exports.addClassElements(getElements(sel), name)};
 	exports.addClassElement = function (element, name) {var i, arr1, arr2;arr1 = element.className.split(" ");arr2 = name.split(" ");
-        for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
-    };
-    exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
+		for (i = 0; i < arr2.length; i++) {if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}}
+	};
+	exports.addClassElements = function (elements, name) {var i, l = elements.length;for (i = 0; i < l; i++) {exports.addClassElement(elements[i], name)}};
 	exports.addSciContext2DFunctions = function(ctx) { //capitals come first
 		ctx = ctx || window.CanvasRenderingContext2D.prototype;
 		//customs
 		ctx.IsCtx = true;
 		ctx.Is2D = true;
 
-		ctx.Fill = function() { //still a test
-			if (ctx.fillStyle === null) {ctx.closePath()}
-			else {ctx.fill()}
-		}
-
+		//normal ctx handlers
+		ctx.Fill = function(color) {
+			ctx.fillStyle = color !== undefined ? color : ctx.fillStyle;
+			ctx.fill();
+		};
+		ctx.Stroke = function(color) {
+			ctx.strokeStyle = color !== undefined ? color : ctx.strokeStyle;
+			ctx.stroke();
+		};
 		ctx.circle = function(x, y, radius) {
 			ctx.arc(x, y, radius, 0, 2 * Math.PI);
+		};
+		ctx.close = function() { //still a test
+			if (ctx.fillStyle === null) {ctx.closePath()}
+			else {ctx.fill()}
 		};
 		ctx.color = function() {
 			ctx.stroke();
@@ -565,12 +573,26 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			ctx.polygon(x, y, sides, size);
 			ctx.fill();
 		};
+		ctx.fillSquare = function(x, y, size) {
+			ctx.square(x, y, size);
+			ctx.fill();
+		};
+		ctx.lineDown = function(y) {ctx.lineTo(0, y)};
+		ctx.lineLeft = function(x) {ctx.lineTo(-x, 0)};
+		ctx.lineRight = function(x) {ctx.lineTo(x, 0)};
+		ctx.lineScalar = function(s) {ctx.lineTo(s, s)};
+		ctx.lineUp = function(y) {ctx.lineTo(0, -y)};
 		ctx.linesTo = function(vertices) { // as array: [x, y, x, y, ...]
 			vertices = vertices || [0, 0];
 			for (var i=0; i<vertices.length; i+=2) {
 				ctx.lineTo(vertices[i], vertices[i+1]);
 			}
 		};
+		ctx.moveDown = function(y) {ctx.moveTo(0, y)};
+		ctx.moveLeft = function(x) {ctx.moveTo(-x, 0)};
+		ctx.moveRight = function(x) {ctx.moveTo(x, 0)};
+		ctx.moveScalar = function(s) {ctx.moveTo(s, s)};
+		ctx.moveUp = function(y) {ctx.moveTo(0, -y)};
 		ctx.octagon = function(x, y, size) {
 			ctx.polygon(x, y, 8, size);
 		};
@@ -584,6 +606,9 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			for (var i = 1; i <= numberOfSides;i += 1) {
 				ctx.lineTo(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
 			}
+		};
+		ctx.square = function(x, y, size) {
+			ctx.rect(x, y, size, size);
 		};
 		ctx.strokeArc = function(x, y, radius, startAngle, endAngle, isCounter) {
 			ctx.strokeEllipse(x, y, radius, radius, 0, startAngle, endAngle, isCounter);
@@ -603,8 +628,13 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			ctx.polygon(x, y, sides, size);
 			ctx.stroke();
 		};
+		ctx.strokeSquare = function(x, y, size) {
+			ctx.square(x, y, size);
+			ctx.stroke();
+		};
 		return ctx;
 	};
+	window.HTMLCanvasElement.prototype.addSci = exports.addSciContext2DFunctions;
     exports.args = function(arg) {return arg.arguments};
     exports.arithmetic = {
         bidivide: function(dividend, divisor){return Number((dividend / divisor) / divisor)},
@@ -725,6 +755,16 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		for (i=0; i<n+1; i++) {count *= i}
 		return count;
 	};
+	exports.fromSimple3dTo2d = function(focalLength, x, y, z) { //?
+		focalLength = focalLength || 1000;
+		x = x || 0;
+		y = y || 0;
+		z = z || 0;
+		var Point3D = {x: x, y: y, z: z};
+		var scale = focalLength/(Point3D.z+focalLength);
+		var Point2D = {x: Point3D.x*scale, y: Point3D.y*scale};
+		return Point2D;
+	};
 	exports.geometry = {
 		area: {
 	   	    annulus: function(r1, r2) {return Math.PI*(r1-r2)},
@@ -826,6 +866,28 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		normal: function(id) {return getElements(id)},
 		warning: function() {console.warn("sci.getSingleElement: Please note that the id must not be specific (i.e. only id, not document.getElementById(id)).")}
 	});
+	exports.importSciElements = function() {
+		exports.importScript('SCIJS-Alpha/sciElements.js');
+		//not in sci, please
+		return exports;
+	};
+	exports.importSciScripts = function() {
+		exports.importScript();
+		exports.importSCI2D();
+		exports.importSciElements();
+		return exports;
+	};
+	exports.importScript = function(src) {
+		var imported = document.createElement("script");
+		imported.src = src || 'SCIJS-Alpha/sciMainBeta.js';
+		document.head.appendChild(imported);
+		return imported;
+	};
+	exports.importSCI2D = function() {
+		exports.importScript('SCIJS-Alpha/SCI2D.js');
+		exports.SCI2D = SCI2D;
+		return exports;
+	};
 	exports.jsonFromServerBeta = function(method, file, async, str) {
 		if (async === undefined) {async=true}
 		if (file === undefined) {console.error("sci.jsonFromServerBeta: file is not defined");return;}
@@ -1058,6 +1120,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.temp.toReaumur = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return c*0.8};
     exports.temp.toRomer = function(fahrenheit){var c=exports.temperature.toCelsius(fahrenheit);return (c*(21/40))+7.5};
     exports.throw = function(arg) {throw arg};
+    exports.toggle = function(thing, val1, val2) {
+    	if (thing === val1) {thing = val2; return thing}
+    	else {thing = val1; return thing}
+    };
     exports.toggleBoolean = function(bool) {
     	if (bool) {bool = false;return bool}
     	else {bool = true;return bool}

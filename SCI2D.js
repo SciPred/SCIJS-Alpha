@@ -690,6 +690,9 @@ Geometries
 			this.y -= vector.y;
 			return this;
 		},
+		toVerticeArray: function() {
+			return [this.x, this.y];
+		},
 		//array
 		fromArray: function ( array, offset ) {
 			if ( offset === undefined ) offset = 0;

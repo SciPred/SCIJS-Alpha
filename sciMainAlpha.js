@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0010";
+	var VERSION = "1.0011";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -295,15 +295,14 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	};
 	exports.__SETTINGS__.toggleSciInDocument.NOTE = function() {console.warn("sci.__SETTINGS__.toggleSciInDocument: This only handles with the document, not the window.")};
 	//prototype and extra stuff
-	exports.prototype = exports.constructor.prototype;
-	exports.prototype.mainHandler = window || "unavailable";
+	exports.mainHandler = window || "unavailable";
 	exports.SCI_SETTINGS_DANGER_HANDLER = exports.__SETTINGS__._DangerSettings_;
-	exports.prototype.string = exports.prototype.constructor.string = exports.constructor.string = "sci";
-	exports.prototype.consTrace = function() {return console.trace()};
+	exports.string = "sci";
+	exports.consTrace = function() {return console.trace()};
 	exports.constructor.DANGER = {delete: exports.__SETTINGS__._DangerSettings_.removeSci || "unavailable"};
 	exports.protocons = exports.prototype.constructor || "unavailable";
 	exports.consproto = exports.constructor.prototype || "unavailable";
-	exports.prototype.documentHandler = document || "unavailable";
+	exports.documentHandler = document || "unavailable";
 	exports.self = exports.parent = exports;
 	exports._INFORMATION = exports.prototype._INFORMATION = function() {
 		if (typeof console === undefined) {

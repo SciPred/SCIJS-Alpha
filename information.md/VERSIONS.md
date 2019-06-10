@@ -1,6 +1,21 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0012 (SELM UPDATE + organized list of update items)
+- SELM is here! You can now do lots of things!
+sciMainAlpha.js: sci
+- added sci.array.reverse
+- added Functions comment
+- added Battery information!
+- added EventsNow, so you can kinda get the data of the previous event
+- some added stuff
+sciElement.js: SELM
+- added Element
+- added elementDisplay (slideshows, div shows, etc.)
+- added displayToggler
+- added Element constructors
+- lots more stuff (er, kinda lots)
+
 ### v1.0011 (INFO UPDATE)
 - sciElements.js update
 - fixed/removed a few prototype functions

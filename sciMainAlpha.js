@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0011";
+	var VERSION = "1.0012";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -324,9 +324,143 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 
 
 	//ALPHA FILE FUNCTIONS
+	/* (((JUST IN CASE)))
+	Types of Functions, keywords and stuff:
+		1. Normal Functions
+			function(arguments)
+		2. function Function
+			function Function(arguments) {code}
+		3. Conditional Functions
+			keyword (condition) {code}
+		4. else Condition Function
+			else {code}
+		5. Keyword Functions
+			keyword arguments
+		6. Constructors
+			new Constructor(arguments)
+		7. Anonymous Functions
+			(code)()
+		8. Array-able Functions
+			getFunction(arguments)[number]
+	*/
 
 
-	//FUNCTIONS (0-9, A-Z, a-z)
+	//SPECIAL FUNCTIONS//
+	//battery (shows only info from first millisecond until next update)
+	function updateBattery() {
+		navigator.getBattery().then(function(battery){
+			exports.Battery = {
+				//normal information
+				charging: battery.charging,
+				level: battery.level,
+				onchargingchange: battery.onchargingchange,
+				onchargingtimechange: battery.onchargingtimechange,
+				ondischargingtimechange: battery.ondischargingtimechange,
+				onlevelchange: battery.onlevelchange,
+				//added information
+				isBattery: true,
+				origination: navigator
+			};
+			exports.Battery.chargingTime = battery.chargingTime === window.Infinity ? "unknown" : battery.chargingTime;
+			exports.Battery.dischargingTime = battery.dischargingTime === window.Infinity ? "unknown" : battery.dischargingTime;
+		});
+		return exports.Battery;
+	}
+	updateBattery();
+	exports.updateBatteryInfo = updateBattery;
+	//events happening now (prev)
+	exports.EventsNow = {
+		KEY: {}, //onkeydown
+		MOUSECLICK: {},
+
+		usingAssign: {
+			KEY: {},
+			MOUSECLICK: {}
+		}
+	};
+	document.addEventListener("click", function(e){
+		Object.assign(exports.EventsNow.usingAssign.MOUSECLICK, e);
+		Object.assign(exports.EventsNow.MOUSECLICK, {
+			altKey: e.altKey,
+			bubbles: e.bubbles,
+			button: e.button,
+			buttons: e.buttons,
+			cancelBubble: e.cancelBubble,
+			cancelable: e.cancelable,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			composed: e.composed,
+			ctrlKey: e.ctrlKey,
+			currentTarget: e.currentTarget,
+			defaultPrevented: e.defaultPrevented,
+			detail: e.detail,
+			eventPhase: e.eventPhase,
+			fromElement: e.fromElement,
+			isTrusted: e.isTrusted,
+			layerX: e.layerX,
+			layerY: e.layerY,
+			metaKey: e.metaKey,
+			movementX: e.movementX,
+			movementY: e.movementY,
+			offsetX: e.offsetX,
+			offsetY: e.offsetY,
+			pageX: e.pageX,
+			pageY: e.pageY,
+			path: e.path,
+			relatedTarget: e.relatedTarget,
+			returnValue: e.returnValue,
+			screenX: e.screenX,
+			screenY: e.screenY,
+			shiftKey: e.shiftKey,
+			sourceCapabilities: e.sourceCapabilities,
+			srcElement: e.srcElement,
+			target: e.target,
+			timeStamp: e.timeStamp,
+			toElement: e.toElement,
+			type: e.type,
+			view: e.view,
+			which: e.which,
+			x: e.x,
+			y: e.y
+		});
+	});
+	document.addEventListener("keypress", function(e){
+		Object.assign(exports.EventsNow.usingAssign.KEY, e);
+		Object.assign(exports.EventsNow.KEY, {
+			altKey: e.altKey,
+			bubbles: e.bubbles,
+			cancelBubble: e.cancelBubble,
+			cancelable: e.cancelable,
+			charCode: e.charCode,
+			code: e.code,
+			composed: e.composed,
+			ctrlKey: e.ctrlKey,
+			currentTarget: e.currentTarget,
+			defaultPrevented: e.defaultPrevented,
+			detail: e.detail,
+			eventPhase: e.eventPhase,
+			isComposing: e.isComposing,
+			isTrusted: e.isTrusted,
+			key: e.key,
+			keyCode: e.keyCode,
+			location: e.location,
+			metaKey: e.metaKey,
+			path: e.path,
+			repeat: e.repeat,
+			returnValue: e.returnValue,
+			shiftKey: e.shiftKey,
+			sourceCapabilities: e.sourceCapabilities,
+			srcElement: e.srcElement,
+			target: e.target,
+			timeStamp: e.timeStamp,
+			type: e.type,
+			view: e.view,
+			which: e.which
+		});
+	});
+
+
+	//ABSOLUTE FUNCTIONS (0-9, A-Z, a-z)//
 	exports.Binary = {
 		AND: function(a, b) {
 			if (a === 1 && b === 1) {return 1}
@@ -646,6 +780,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     exports.array = {
     	getItem: function(arr, n) {return arr[n]},
     	isItem: function(arr, n, item) {return arr[n] === item},
+    	reverse: function(arr) {arr.reverse();return arr},
     	setItem: function(arr, n, item) {arr[n] = item;return arr}
     };
     exports.array.addItemToEnd = function(arr, item) {arr[arr.length] = item;return arr};
@@ -1055,7 +1190,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
             exports.removeClassElement(elements[i], name);
         }
     };
-    exports.reverseArray = function(arr) {arr.reverse();return arr};
+    exports.reverseArray = exports.array.reverse || "unavailable";
     exports.reverseBoolean = function(bool) {
     	if (bool === true) {return false}
     	return true;

@@ -24,9 +24,11 @@ It includes these files:
 - SOURCES.md (containing sources) because I give thanks
 - VERSIONS.md (containing the versions) because I don't do Git
 
-### CURRENT VARIABLES:
-- sci
-- sciBeta
-- sciElements
-- SCI2D
-- SCI2DBeta
+### CURRENT VARIABLES (with version of their addition):
+- Scanvas (v1.0003 added, v1.0007 renamed)
+- sci (v1.0000)
+- sciBeta (v1.0010)
+- sciElements (v1.0010)
+- SCI2D (v1.0007)
+- SCI2DBeta (v1.0008)
+- SELM (v1.0012)

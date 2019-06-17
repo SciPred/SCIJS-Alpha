@@ -1,6 +1,14 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0013 (SCON UPDATE, SCI3D still far)
+SCON.js: SCON (new)
+- SCON stands for sciConstructor - you can now create a sci version of Arrays, Numbers, etc. - only tweaked!
+- no Object and RegExp because I haven't decided how
+- maybe? Need to focus on something else
+sciElements.js: SELM
+- made setZ in SELM.zIndexEditor to activate on construct
+
 ### v1.0012 (SELM UPDATE + organized list of update items)
 - SELM is here! You can now do lots of things!
 sciMainAlpha.js: sci

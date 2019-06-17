@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0012";
+	var VERSION = "1.0013";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -1009,6 +1009,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		exports.importScript();
 		exports.importSCI2D();
 		exports.importSciElements();
+		exports.importSCON();
 		return exports;
 	};
 	exports.importScript = function(src) {
@@ -1020,6 +1021,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	exports.importSCI2D = function() {
 		exports.importScript('SCIJS-Alpha/SCI2D.js');
 		exports.SCI2D = SCI2D;
+		return exports;
+	};
+	exports.importSCON = function() {
+		exports.importScript('SCIJS-Alpha/SCON.js');
 		return exports;
 	};
 	exports.jsonFromServerBeta = function(method, file, async, str) {

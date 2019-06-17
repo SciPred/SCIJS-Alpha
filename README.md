@@ -31,4 +31,5 @@ It includes these files:
 - sciElements (v1.0010)
 - SCI2D (v1.0007)
 - SCI2DBeta (v1.0008)
+- SCON (v1.0013)
 - SELM (v1.0012)

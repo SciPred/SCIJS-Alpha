@@ -443,6 +443,8 @@
 				this.elements[i].style.zIndex = this.z;
 			}
 		};
+		//auto
+		this.setZ();
 	};
 	Object.assign(exports.zIndexEditor.prototype, {
 		getZ: function() {return this.z},

@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0013";
+	var VERSION = "1.0014";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -1027,6 +1027,10 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 		exports.importScript('SCIJS-Alpha/SCON.js');
 		return exports;
 	};
+	exports.importSMATH = function() {
+		exports.importScript('SCIJS-Alpha/SMATH.js');
+		return exports;
+	};
 	exports.jsonFromServerBeta = function(method, file, async, str) {
 		if (async === undefined) {async=true}
 		if (file === undefined) {console.error("sci.jsonFromServerBeta: file is not defined");return;}
@@ -1121,7 +1125,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
     	}
     	return count;
     };
-	exports.math.switchSign = function(n) {n=-n;return n};exports.new = function(func) {var arg=func || Object;return new arg};
+	exports.math.switchSign = function(n) {n=-n;return n};
 	exports.negate = function(n) {if (IsPositive(n)) {n=-n;return n} else {console.warn("sci.negate: number is already negative: " + n);return n}};
 	exports.new = function(func) {var arg=func || Object;return new arg};
 	Object.assign(exports.new, {

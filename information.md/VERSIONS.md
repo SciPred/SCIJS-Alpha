@@ -1,6 +1,23 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0014 (SMATH UPDATE)
+- working on something else... for now
+- I'll be busy on Swift firstly... bye for now
+SMATH.js: SMATH and SNUM (new)
+- SMATH stands for sciMath - more and more functions.
+- SNUM is sciNumber.
+- (you've heard of million, billion, and trillion... what about quadrillion, quintillion, and sextillion?)
+- lots of math and thousands of numbers
+- this SMATH variable contains a lot more than your average Math variable...
+- transferred SCON.Number to SNUM.Number... welp
+sciMainAlpha.js: sci
+- added importSMATH
+- deleted spotted sci.new duplicate
+SCI2D.js: SCI2D
+- rewrote the WHOLE of SCI2D (ouchmyhandshurt.com)
+- removed a few stuff... sorry :(
+
 ### v1.0013 (SCON UPDATE, SCI3D still far)
 SCON.js: SCON (new)
 - SCON stands for sciConstructor - you can now create a sci version of Arrays, Numbers, etc. - only tweaked!

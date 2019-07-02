@@ -12,6 +12,7 @@ These links are clickable, excluding the non-links section. Visit them if you li
 ## Direct Links
 - [Drawing Text](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_text "developer.mozilla.org")
 - [How To Render 3D in 2D](https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas "www.basedesign.com")
+- [List Of Numbers](https://sites.google.com/site/pointlesslargenumberstuff/home/l/pgln2 "sites.google.com")
 - [Standard Function for Polygons](https://stackoverflow.com/questions/4839993/how-to-draw-polygons-on-an-html5-canvas "stackoverflow.com")
 
 ## Links for the Coming-Up SCI3D.js

@@ -33,3 +33,5 @@ It includes these files:
 - SCI2DBeta (v1.0008)
 - SCON (v1.0013)
 - SELM (v1.0012)
+- SMATH (v1.0014)
+- SNUM (v1.0014)

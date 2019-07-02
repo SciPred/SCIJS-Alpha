@@ -315,12 +315,8 @@ Geometries
 
 /*
 Polyfills
-_Math
-ctxLineDash
-isPointInPath
-loop
-renderScene (anonymous) and Scene
 Vector
+Scene
 Geometritize (unoff.)
 Geometries
 */
@@ -369,238 +365,6 @@ Geometries
 		} )();
 	}//always put type and isThing
 
-	var _Math = {
-		type: "Math",
-		isMath: true,
-
-		add: function (values) {
-			var count = 0;
-			for (var i=0; i<values.length; i++) {
-				count += values[i];
-			}
-			return count;
-		},
-		multiply: function (values) {
-			var count = 1;
-			for (var i=0; i<values.length; i++) {
-				if (values[i]==0) {
-					return 0;
-				}
-				if (typeof values[i] !== 'number') {
-					return NaN;
-				}
-				count *= values[i];
-			}
-			return count;
-		},
-		DEG2RAD: Math.PI / 180,
-		RAD2DEG: 180 / Math.PI,
-		FRAME: 100/6,
-		generateUUID: ( function () {
-			var lut = [];
-			for ( var i = 0; i < 256; i ++ ) {
-				lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
-			}
-			return function generateUUID() {
-				var d0 = Math.random() * 0xffffffff | 0;
-				var d1 = Math.random() * 0xffffffff | 0;
-				var d2 = Math.random() * 0xffffffff | 0;
-				var d3 = Math.random() * 0xffffffff | 0;
-				var uuid = lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
-					lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
-					lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
-					lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
-				return uuid.toUpperCase();
-			};
-		} )(),
-		deg2rad: function (degrees) {
-			return degrees*Math.PI/180;
-		},
-		rad2deg: function (radians) {
-			return radians*180/Math.PI;
-		}
-	};
-
-	exports.ctxLineDash = function(ctx, dash) {
-		var d = dash || [];
-		ctx.setLineDash(d);
-		return ctx;
-	};
-	exports.getArcEnd = function(center, r, endAngle) {
-		center = center || new exports.Vector();
-		var radius = r || 100;
-		var angle = endAngle || 2 * Math.PI;
-		var c1 = center.x, c2 = center.y;
-		return new exports.Vector(c1+Math.cos(angle)*radius, c2+Math.sin(angle)*radius);
-	};
-	exports.isPointInPath = function(ctx, x, y) {
-		if (ctx === undefined || ctx.canvas === undefined) {
-			console.error("SCI2D.isPointInPath: ctx is either not defined or not context: " + ctx);
-			return "unavailable";
-		}
-		if (y !== undefined) {
-			return ctx.isPointInPath(x, y);
-		}
-		if (y === undefined || typeof x === "object") {
-			return ctx.isPointInPath(x.x, x.y);
-		}
-		if (y === undefined || typeof x === "number") {
-			return ctx.isPointInPath(x, 0);
-		}
-		if (y === x && x === undefined) {
-			return ctx.isPointInPath(0, 0);
-		}
-		return false;
-	};
-	exports.loop = function(func) {
-		requestAnimationFrame(func);
-		return func;
-	};
-
-	function renderScene(ctx, scene) {
-		var ellipse, geometry, vertices, grid;
-		var x, y;
-		var bw, bh, p;
-
-		ctx.canvas.width = ctx.canvas.width;
-		ctx.canvas.style.background = scene.background;
-
-		if (scene.ellipses !== []) {
-			for (var i=0; i<scene.ellipses.length; i++) {
-				ellipse = scene.ellipses[i];
-				ellipse.moveVertices(ellipse.movement.x, ellipse.movement.y);
-				ellipse.position.x += ellipse.movement.x;
-				ellipse.position.y += ellipse.movement.y;
-				x = ellipse.position.x; y = ellipse.position.y;
-
-				ctx.beginPath();
-				ctx.setLineDash(ellipse.dashedSegments);
-				ctx.ellipse(x, y, ellipse.radiusX, ellipse.radiusY, ellipse.rotation, ellipse.startAngle, ellipse.endAngle, ellipse.isCounter);
-				ctx.setLineDash([]);
-				ctx.strokeStyle = ellipse.stroke || 'black';
-				ctx.stroke();
-				if (ellipse.fill !== undefined) {ctx.fillStyle = ellipse.fill; ctx.fill()}
-				else {ctx.closePath()}
-
-				if (ellipse.vertices !== []) {
-					ctx.beginPath();
-					ctx.moveTo(ellipse.vertices[0], ellipse.vertices[1]);
-					for (var j=2; j<scene.vertices.length; j+=2) {
-						ctx.lineTo(ellipse.vertices[i], ellipse.vertices[i + 1]);
-					}
-					ctx.strokeStyle = ellipse.stroke || "black";
-					ctx.stroke();
-					if (ellipse.fill !== undefined) {ctx.fillStyle = ellipse.fill; ctx.fill()}
-					else {ctx.closePath()}
-				}
-			}
-		}
-		if (scene.geometries !== []) {
-			for (var i=0; i<scene.geometries.length; i++) {
-				geometry = scene.geometries[i];
-				geometry.moveVertices(geometry.movement.x, geometry.movement.y);
-				vertices = geometry.vertices;
-
-				ctx.beginPath();
-				ctx.setLineDash(geometry.dashedSegments);
-				ctx.moveTo(vertices[0], vertices[1]);
-				for (var j=2; j<vertices.length; j+=2) {
-					ctx.lineTo(vertices[j], vertices[j + 1]);
-				}
-				ctx.setLineDash([]);
-				ctx.strokeStyle = geometry.stroke || 'black';
-				ctx.stroke();
-				if (geometry.fill !== undefined) {ctx.fillStyle = geometry.fill; ctx.fill()}
-				else {ctx.closePath()}
-			}
-		}
-		if (scene.vertices !== []) {
-			for (var i=0; i<scene.vertices.length; i+=2) {
-				scene.vertices[i] += scene.verticesMovement.x; scene.vertices[i + 1] += scene.verticesMovement.y;
-
-			}
-			ctx.beginPath();
-			ctx.setLineDash(scene.verticesDashSegments);
-			ctx.moveTo(scene.vertices[0], scene.vertices[1]);
-			for (var i=2; i<scene.vertices.length; i+=2) {
-				ctx.lineTo(scene.vertices[i], scene.vertices[i + 1]);
-			}
-			ctx.setLineDash([]);
-			ctx.strokeStyle = scene.verticesStroke || 'black';
-			ctx.stroke();
-			ctx.closePath();
-		}
-	}
-
-	exports.Scene = function() {
-		this.background = 'white';
-
-		this.vertices = [];
-		this.verticesDashSegments = [];
-		this.verticesStroke = null;
-		this.verticesMovement = new exports.Vector();
-		this.geometries = []; //focus on vertices
-		this.ellipses = []; //say, [{r:'', stroke:'', fill:'', rot:''}, {etc.}, {etc.}], pos and movement included
-	};
-	Object.assign(exports.Scene.prototype, {
-		type: "Scene",
-		isScene: true,
-
-		add: function(geometry) {
-			if (geometry.elliptical) {
-				this.ellipses[this.ellipses.length] = geometry;
-				return this;
-			} else if (geometry.elliptical === false) {
-				this.geometries[this.geometries.length] = geometry;
-				return this;
-			} else if (geometry.elliptical === undefined) {
-				console.error("SCI2D.Scene.add: elliptical is not Boolean, making it true");
-				geometry.elliptical = true;
-				this.ellipses[this.ellipses.length] = geometry;
-				return this;
-			}
-		},
-		addVertices: function(vertices) {
-			this.vertices.push(vertices);
-			return this;
-		},
-		empty: function() {
-			this.vertices = [];
-			this.verticesDashSegments = [];
-			this.verticesStroke = null;
-			this.geometries = [];
-			this.ellipses = [];
-			return this;
-		},
-		placeOnCanvas: function(ctx) {
-			if (ctx.canvas === undefined) {renderScene(ctx.getContext("2d"), this);}
-			else {renderScene(ctx, this);}
-		},
-		remove: function(geometry) { //BETA
-			for (var i=0; i<this.geometries.length; i++) {
-				if (this.geometries[i] === geometry) {this.geometries.splice(this.geometries[i], 1); return geometry}
-			}
-			for (var i=0; i<this.ellipses.length; i++) {
-				if (this.ellipses[i] === geometry) {this.ellipses.splice(this.ellipses[i], 1); return geometry}
-			}
-			return "unavailable";
-		}
-	});
-	exports.Scene.prototype.placeOnCanvas.information = function() {
-		console.log("SCI2D INFORMATION: Scene.placeOnCanvas");
-		console.log("The argument \"ctx\" does not necessarily have to be the ctx itself, you can also use the canvas itself.");
-		console.warn("Any other argument than a ctx or a canvas handler will not work.");
-		console.dir("LOG: Scene information will be written below when in Google Console:");
-		return exports.Scene;
-	};
-	exports.Scene.prototype.remove.information = function() {
-		console.log("SCI2D INFORMATION: Scene.remove");
-		console.log("The argument \"geometry\" does not need to have a ctx.");
-		console.warn("Unfortunately, the geometries come before the ellipses, so any geometry can be deleted in both.");
-		console.dir("LOG: This is only a BetaTest. The Scene.remove information will be written below when in Google Console:");
-		return exports.Scene.prototype.remove;
-	};
-
 	exports.Vector = function(x, y) {
 		this.x = x || 0;
 		this.y = y || 0;
@@ -609,10 +373,20 @@ Geometries
 		type: "Vector",
 		isVector: true,
 
-		add: function(vector) {
-			this.x += vector.x;
-			this.y += vector.y;
+		add: function(x, y) {
+			this.x += Math.abs(x); //no trickery in my sight, bub
+			this.y += Math.abs(y);
 			return this;
+		},
+		addScalar: function(s) {
+			this.add(s, s);
+			return this;
+		},
+		angle: function () {
+			// computes the angle in radians with respect to the positive x-axis
+			var angle = Math.atan2( this.y, this.x );
+			if ( angle < 0 ) angle += 2 * Math.PI;
+			return angle;
 		},
 		clone: function () {
 			return new this.constructor( this.x, this.y );
@@ -622,37 +396,47 @@ Geometries
 			this.y = v.y;
 			return this;
 		},
-		divideScalar: function(n) {
-			this.x /= n;
-			this.y /= n;
+		distanceTo: function ( v ) {
+			return Math.sqrt( this.distanceToSquared( v ) );
+		},
+		distanceToSquared: function ( v ) {
+			var dx = this.x - v.x, dy = this.y - v.y;
+			return dx * dx + dy * dy;
+		},
+		divide: function(x, y) {
+			this.x /= x;
+			this.y /= y;
 			return this;
 		},
-		get: function() {return this},
+		divideScalar: function(s) {
+			this.divide(s, s);
+			return this;
+		},
+		equals: function ( v ) {
+			return ( ( v.x === this.x ) && ( v.y === this.y ) );
+		},
+		fromVerticeArray: function(array) {
+			this.x = array[0];
+			this.y = array[1];
+			return this;
+		},
 		getX: function() {return this.x},
 		getY: function() {return this.y},
 		hasScalarCoordinates: function() {return this.x === this.y},
+		identity: function() {
+			this.x = 0;
+			this.y = 0;
+			return this;
+		},
 		isBothNaN: function() {return isNaN(this.x) && isNaN(this.y)},
 		isNaN: function() {return isNaN(this.x) || isNaN(this.y)},
-		move: function(x, y) {
-			this.x += x;
-			this.y += y;
+		multiply: function(x, y) {
+			this.x *= x;
+			this.y *= y;
 			return this;
 		},
-		moveScalar: function(s) {
-			this.move(s, s);
-			return this;
-		},
-		moveX: function(x) {
-			this.x += x;
-			return this;
-		},
-		moveY: function(y) {
-			this.y += y;
-			return this;
-		},
-		multiplyScalar: function(n) {
-			this.x *= n;
-			this.y *= n;
+		multiplyScalar: function(s) {
+			this.multiply(s, s);
 			return this;
 		},
 		negate: function() {
@@ -660,18 +444,20 @@ Geometries
 			this.y = - this.y;
 			return this;
 		},
-		rotate: function(theta) { //degrees (beta)
-			var x = this.x, y = this.y;
-			var a = theta || 90;
-			var cos = Math.cos(a), sin = Math.sin(a);
-			this.x = (x * cos) - (y * sin);
-			this.y = (x * sin) + (y * cos);
-			return this;
+		paste: function(v) {
+			v.x = this.x;
+			v.y = this.y;
+			return v;
 		},
-		rotateMatrix: function(matrix) { //untriged; matrix is 2x2; no elements
-			var x = this.x, y = this.y;
-			this.x = (x * matrix[0]) - (y * matrix[1]); //i.x and j.x
-			this.y = (x * matrix[2]) + (y * matrix[3]); //y
+		rotate: function(angle) {
+			return this.rotateAround(new exports.Vector(), angle);
+		},
+		rotateAround: function ( center, angle ) {
+			var c = Math.cos( angle ), s = Math.sin( angle );
+			var x = this.x - center.x;
+			var y = this.y - center.y;
+			this.x = x * c - y * s + center.x;
+			this.y = x * s + y * c + center.y;
 			return this;
 		},
 		set: function(x, y) {
@@ -685,9 +471,13 @@ Geometries
 		},
 		setX: function(x) {this.x = x;return this},
 		setY: function(y) {this.y = y;return this},
-		subtract: function(vector) {
-			this.x -= vector.x;
-			this.y -= vector.y;
+		subtract: function(x, y) {
+			this.x -= Math.abs(x); //no trickery in my sight, bub
+			this.y -= Math.abs(y);
+			return this;
+		},
+		subtractScalar: function(s) {
+			this.subtract(s, s);
 			return this;
 		},
 		toVerticeArray: function() {
@@ -709,58 +499,76 @@ Geometries
 		}
 	});
 
+	exports.Scene = function() {
+		this.background = "#000000";
+		this.geometries = [];
+		this.autoClear = true;
+	};
+	Object.assign(exports.Scene.prototype, {
+		type: "Scene",
+		isScene: true,
+
+		add: function(geometry) {
+			this.geometries.push(geometry);
+			return this;
+		},
+		empty: function() {
+			this.geometries = [];
+			return this;
+		},
+		render: function(canvas) {
+			var ctx = canvas.getContext("2d");
+			var halfW = canvas.width/2,
+				halfH = canvas.height/2;
+			var geometry, x, y, vector, vertex;
+
+			if (this.autoClear) {ctx.clearRect(0, 0, canvas.width, canvas.height)}
+
+			for (var i=0; i<this.geometries.length; i++) {
+				geometry = this.geometries[i];
+				ctx.beginPath();
+				ctx.moveTo(geometry.vertices[0] + halfW, geometry.vertices[1] + halfH);
+				for (var j=2; j<geometry.vertices.length; j+=2) {
+					x = geometry.vertices[j];
+					y = geometry.vertices[j+1];
+					ctx.lineTo(x + halfW, y + halfH);
+				}
+				ctx.strokeStyle = geometry.stroke;
+				ctx.stroke();
+				if (geometry.fill === undefined) {ctx.closePath()}
+				else {ctx.fillStyle = geometry.fill; ctx.fill()}
+			}
+		}
+	});
+
 	function Geometritize(func) {
-		func.uuid = _Math.generateUUID();
 		func.name = '';
 		func.maintype = "Geometry";
 
-		func.stroke = null;
+		func.stroke = "#000000";
 		func.fill = null;
 
-		func.position = new exports.Vector(100, 100);
+		func.position = new exports.Vector();
 		func.movement = new exports.Vector();
+		func.rotation = 0; //angle
 		func.vertices = [];
-
-		func.dashedSegments = []; //for setLineDash(). This is for the stroke. Always remember to put setLineDash([]) after setLineDash([segments]).
 
 		Object.assign(func, {
 			isGeometry: true,
 
-			addToScene: function(scene) {
-				scene.add(func);
-				return scene;
-			},
-			get: function() {
-				return func;
-			},
-			getDash: function() {
-				return func.dashedSegments;
-			},
 			getString: function() {
 				return func.toString();
 			},
-			moveVertices: function(x, y) {
-				var vector, vertex, vx, vy;
-				for (var i=0; i<func.vertices.length; i+=2) {
-					vx = func.vertices[i]; vy = func.vertices[i + 1];
-					vector = new exports.Vector(vx, vy);
-					vertex = vector.move(x, y);
-					func.vertices[i] = vertex.x; func.vertices[i + 1] = vertex.y;
-				}
-				func.position.x += x;
-				func.position.y += y;
-				return func;
+			rotate: function(angle) {
+				angle = angle || func.rotation;
+				return func.rotateAround(func.position, angle);
 			},
-			newUUID: function() {
-				func.uuid = _Math.generateUUID();
-				return func;
-			},
-			rotateVertices: function(angle) {
+			rotateAround: function(center, angle) {
 				var vertex, vector, x, y, a = angle || 0;
 				for (var i=0; i<func.vertices.length; i+=2) {
 					x = func.vertices[i]; y = func.vertices[i + 1];
 					vector = new exports.Vector(x, y);
-					vertex = vector.rotate(a);
+					vertex = vector.rotateAround(center, a);
 					func.vertices[i] = vertex.x; func.vertices[i + 1] = vertex.y;
 				}
 				return func;
@@ -780,472 +588,97 @@ Geometries
 		});
 	};
 
-	//NON-ELLIPTICAL GEOMETRY
-	exports.BoxGeometry = function(width, height) {
+	//geometries
+	exports.HexagonGeometry = function(size) {
 		Geometritize(this);
-		this.type = "BoxGeometry";
-		this.elliptical = false;
-		this.parameters = {
-			width: width,
-			height: height
-		};
-
-		this.width = width || 1;
-		this.height = height || 1;
-
-		var c = this.position;
-		var w = this.width/2, h = this.height/2;
-
-		this.vertices = [
-			c.x-w, c.y-h,
-			c.x-w, c.y+h,
-			c.x+w, c.y+h,
-			c.x+w, c.y-h,
-			c.x-w, c.y-h
-		];
-	};
-	Object.assign(exports.BoxGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			var c = this.position;
-			var w = this.width/2, h = this.height/2;
-
-			this.vertices = [
-				c.x-w, c.y-h,
-				c.x-w, c.y+h,
-				c.x+w, c.y+h,
-				c.x+w, c.y-h,
-				c.x-w, c.y-h
-			];
-			return this;
-		},
-		setDimensions: function(width, height) {
-			this.width = width || 1; this.height = height || 1;
-			var c = this.position;
-			var w = this.width/2, h = this.height/2;
-
-			this.vertices = [
-				c.x-w, c.y-h,
-				c.x-w, c.y+h,
-				c.x+w, c.y+h,
-				c.x+w, c.y-h,
-				c.x-w, c.y-h
-			];
-			return this;
-		}
-	});
-	exports.DecagonGeometry = function(size) {
-		Geometritize(this);
-		this.type = "DecagonGeometry";
-		this.elliptical = false;
+		this.type = "HexagonGeometry";
 		this.parameters = {
 			size: size
 		};
 		this.size = size || 10;
 
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 10;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		//nonset
+		this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+		for (var i = 1; i <= 6; i += 1) {
+			this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / 6), this.position.y + this.size * Math.sin(i * 2 * Math.PI / 6));
 		}
-	};
-	Object.assign(exports.DecagonGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
 
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 10;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		this.set = function() {
+			this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+			for (var i = 1; i <= 6; i += 1) {
+				this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / 6), this.position.y + this.size * Math.sin(i * 2 * Math.PI / 6));
 			}
 			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-	exports.IcosagonGeometry = function(size) {
-		Geometritize(this);
-		this.type = "IcosagonGeometry";
-		this.elliptical = false;
-		this.parameters = {
-			size: size
 		};
-		this.size = size || 10;
-
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 20;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-		}
 	};
-	Object.assign(exports.IcosagonGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
-
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 20;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-			}
-			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-	exports.OctagonGeometry = function(size) {
-		Geometritize(this);
-		this.type = "OctagonGeometry";
-		this.elliptical = false;
-		this.parameters = {
-			size: size
-		};
-		this.size = size || 10;
-
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 8;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-		}
-	};
-	Object.assign(exports.OctagonGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
-
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 8;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-			}
-			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
 	exports.PentagonGeometry = function(size) {
 		Geometritize(this);
 		this.type = "PentagonGeometry";
-		this.elliptical = false;
 		this.parameters = {
 			size: size
 		};
 		this.size = size || 10;
 
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 5;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		//nonset
+		this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+		for (var i = 1; i <= 5; i += 1) {
+			this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / 5), this.position.y + this.size * Math.sin(i * 2 * Math.PI / 5));
 		}
-	};
-	Object.assign(exports.PentagonGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
 
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 5;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		this.set = function() {
+			this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+			for (var i = 1; i <= 5; i += 1) {
+				this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / 5), this.position.y + this.size * Math.sin(i * 2 * Math.PI / 5));
 			}
 			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-	exports.PolygonGeometry = function(sides, size) {
+		};
+	};
+	exports.PolygonGeometry = function(vertices) {
 		Geometritize(this);
-		this.type = "PolygonGeometry";
-		this.elliptical = false;
+		this.type = "RegPolGeometry";
+		this.parameters = {
+			vertices: vertices
+		};
+		this.vertices = vertices || [];
+	};
+	exports.RegPolGeometry = function(sides, size) {
+		Geometritize(this);
+		this.type = "RegPolGeometry";
 		this.parameters = {
 			sides: sides,
 			size: size
 		};
 		this.size = size || 10;
+		this.sides = sides || 3;
 
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = sides || 3;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		//nonset
+		this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+		for (var i = 1; i <= this.sides; i += 1) {
+			this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / this.sides), this.position.y + this.size * Math.sin(i * 2 * Math.PI / this.sides));
 		}
-	};
-	Object.assign(exports.PolygonGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
 
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = this.parameters.sides || 3;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+		this.set = function() {
+			this.vertices.push(this.position.x + this.size * Math.cos(0), this.position.y + this.size *  Math.sin(0));
+			for (var i = 1; i <= this.sides; i += 1) {
+				this.vertices.push(this.position.x + this.size * Math.cos(i * 2 * Math.PI / this.sides), this.position.y + this.size * Math.sin(i * 2 * Math.PI / this.sides));
 			}
 			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-	exports.TiltedSquareGeometry = function(size) {
+		};
+	};
+	exports.SquareGeometry = function(size) {
 		Geometritize(this);
-		this.type = "TiltedSquareGeometry";
-		this.elliptical = false;
+		this.type = "SquareGeometry";
 		this.parameters = {
 			size: size
 		};
 		this.size = size || 10;
-
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 4;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-		}
-	};
-	Object.assign(exports.TiltedSquareGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
-
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 4;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-			}
-			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-	exports.TrapezoidGeometry = function(base1, base2, height) {
-		Geometritize(this);
-		this.type = "TrapezoidGeometry";
-		this.elliptical = false;
-		this.parameters = {
-			base1: base1,
-			base2: base2,
-			height: height
-		};
-
-		this.base1 = base1 || 10;
-		this.base2 = base2 || 15;
-		this.width = (base1 + base2)/2; //average
-		this.height = height || 10;
-
-		var c = this.position;
-		var b1 = this.base1/2, b2 = this.base2/2, h = this.height/2;
 
 		this.vertices = [
-			c.x-b1, c.y-h,
-			c.x+b1, c.y-h,
-			c.x+b2, c.y+h,
-			c.x-b2, c.y+h,
-			c.x-b1, c.y-h
+			this.position.x - this.size, this.position.y - this.size,
+			this.position.x + this.size, this.position.y - this.size,
+			this.position.x + this.size, this.position.y + this.size,
+			this.position.x - this.size, this.position.y + this.size,
+			this.position.x - this.size, this.position.y - this.size
 		];
 	};
-	Object.assign(exports.TrapezoidGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			var c = this.position;
-			var b1 = this.base1/2, b2 = this.base2/2, h = this.height/2;
-
-			this.vertices = [
-				c.x-b1, c.y-h,
-				c.x+b1, c.y-h,
-				c.x+b2, c.y+h,
-				c.x-b2, c.y+h,
-				c.x-b1, c.y-h
-			];
-			return this;
-		},
-		setDimensions: function(base1, base2, height) {
-			this.width = (base1 + base2)/2; this.height = height || 10;
-			var c = this.position;
-			var b1 = this.base1/2, b2 = this.base2/2, h = this.height/2;
-
-			this.vertices = [
-				c.x-b1, c.y-h,
-				c.x+b1, c.y-h,
-				c.x+b2, c.y+h,
-				c.x-b2, c.y+h,
-				c.x-b1, c.y-h
-			];
-			return this;
-		}
-	});
-	exports.TriangleGeometry = function(size) {
-		Geometritize(this);
-		this.type = "TriangleGeometry";
-		this.elliptical = false;
-		this.parameters = {
-			size: size
-		};
-		this.size = size || 10;
-
-		var c = this.position;
-		var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 3;
-		size = this.size;
-
-		this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-		for (var i = 1; i <= numberOfSides;i += 1) {
-			this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-		}
-	};
-	Object.assign(exports.TriangleGeometry.prototype, {
-		setCenter: function(center) {
-			this.position = center || new exports.Vector(100, 100);
-			this.vertices = [];
-
-			var c = this.position;
-			var Xcenter = c.x, Ycenter = c.y,
-		    numberOfSides = 3;
-			var size = this.size;
-
-			this.vertices.push(Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));
-			for (var i = 1; i <= numberOfSides;i += 1) {
-				this.vertices.push(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
-			}
-			return this;
-		},
-		setSize: function(size) {
-			this.size = size || 10;
-			this.setCenter(this.position);
-			return this;
-		}
-	});
-
-	//ELLIPTICAL GEOMETRY (no need for setCenter)
-	exports.ArcGeometry = function(radius, startAngle, endAngle, isCounter) {
-		Geometritize(this);
-		this.type = "ArcGeometry";
-		this.elliptical = true;
-		this.parameters = {
-			radius: radius,
-			startAngle: startAngle,
-			endAngle: endAngle,
-			isCounter: isCounter
-		};
-		this.rotation = 0;
-
-		radius = radius || 1;
-		startAngle = startAngle || 0;
-		endAngle = endAngle || 2 * Math.PI;
-		isCounter = isCounter || false;
-
-		this.radiusX = radius;
-		this.radiusY = radius;
-		this.startAngle = startAngle;
-		this.endAngle = endAngle;
-		this.isCounter = isCounter;
-	};
-	exports.CircleGeometry = function(radius) {
-		Geometritize(this);
-		this.type = "ArcGeometry";
-		this.elliptical = true;
-		this.parameters = {
-			radius: radius
-		};
-		this.rotation = 0;
-
-		radius = radius || 1;
-
-		this.radiusX = radius;
-		this.radiusY = radius;
-		this.startAngle = 0;
-		this.endAngle = 2 * Math.PI;
-		this.isCounter = false;
-	};
-	exports.EllipseGeometry = function(radiusX, radiusY, startAngle, endAngle, isCounter) {
-		Geometritize(this);
-		this.type = "EllipseGeometry";
-		this.elliptical = true;
-		this.parameters = {
-			radiusX: radiusX,
-			radiusY: radiusY,
-			startAngle: startAngle,
-			endAngle: endAngle,
-			isCounter: isCounter
-		};
-		this.rotation = 0;
-
-		radiusX = radiusX || 1;
-		radiusY = radiusY || 1;
-		startAngle = startAngle || 0;
-		endAngle = endAngle || 2 * Math.PI;
-		isCounter = isCounter || false;
-
-		this.radiusX = radiusX;
-		this.radiusY = radiusY;
-		this.startAngle = startAngle;
-		this.endAngle = endAngle;
-		this.isCounter = isCounter;
-	};
-
-
-	exports.Math = _Math;
 }));

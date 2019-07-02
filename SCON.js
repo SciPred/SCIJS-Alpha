@@ -247,96 +247,6 @@
 			return this.value.valueOf();
 		}
 	});
-	exports.Number = function(value) {
-		this.value = Number(value) || 0;
-	};
-	Object.assign(exports.Number, {
-		NEGATIVE_INFINITY: -Infinity,
-		POSITIVE_INFINITY: Infinity,
-		UNDEFINED: undefined,
-
-		isNumber: function(number) {
-			var num = number.constructor === exports.Number ? number.value : number;
-			return typeof num === "number" || num === Infinity || num === -Infinity;
-		}
-	});
-	Object.assign(exports.Number.prototype, {
-		constructor: exports.Number,
-		isNumber: true,
-		type: "Number",
-
-		add: function(items) {
-			for (var i=0; i<arguments.length; i++) {
-				this.value += Number(arguments[i]);
-			}
-			return this.value;
-		},
-		ceil: function() {
-			this.value = Math.ceil(this.value);
-			return this.value;
-		},
-		clone: function() {
-			return new this.constructor().copy(this);
-		},
-		copy: function(number) {
-			var num = number.constructor === exports.Number ? number.value : number;
-			this.value = num;
-			return this.value;
-		},
-		divide: function(items) {
-			for (var i=0; i<arguments.length; i++) {
-				this.value /= Number(arguments[i]);
-			}
-			return this.value;
-		},
-		floor: function() {
-			this.value = Math.floor(this.value);
-			return this.value;
-		},
-		moveDecimalPoint: function(times, toRight) {
-			times = Number(times) || 1;
-			toRight = toRight || false;
-			for (var i=0; i<times; i++) {
-				if (toRight) {
-					this.value *= 10;
-				} else {
-					this.value /= 10;
-				}
-			}
-			return this.value;
-		},
-		multiply: function(items) {
-			for (var i=0; i<arguments.length; i++) {
-				this.value *= Number(arguments[i]);
-			}
-			return this.value;
-		},
-		round: function() {
-			this.value = Math.round(this.value);
-			return this.value;
-		},
-		subtract: function(items) {
-			for (var i=0; i<arguments.length; i++) {
-				this.value -= Number(arguments[i]);
-			}
-			return this.value;
-		},
-		toExponential: function(fractionDigits) {
-			return this.value.toExponential(fractionDigits);
-		},
-		toFixed: function(nearest) {
-			return this.value.toFixed(nearest);
-		},
-		toPrecision: function(precision) {
-			return this.value.toPrecision(precision);
-		},
-		toString: function() {
-			return this.value.toString();
-		},
-		valueOf: function() {
-			return this.value.valueOf();
-		}
-	});
 	exports.String = function(string) {
 		this.string = string || "Hello World!";
 		this.length = this.string.length;
@@ -379,6 +289,12 @@
 				this.concat(str);
 			}
 			return this.string;
+		},
+		equals: function(string) {
+			if (string.constructor === exports.String) {
+				return string.value = this.value;
+			}
+			return string = this.value;
 		},
 		indexOf: function(substring, start) {
 			return this.string.indexOf(substring, start);

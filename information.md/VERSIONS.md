@@ -1,6 +1,14 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0015 (SCI UPDATE)
+ - I'm back... with SCI.js
+ - any update in SCI.js files don't count as major updates like these
+ - added some new HTMLElement functions, like .clicks for buttons
+ - added CSS! You thought I only did JS didcha? Heheheheeheeeheehhehehehehe...
+ - Enjoy :)
+ - (for more info on the code see the code at SCI/SCI.js)
+
 ### v1.0014 (SMATH UPDATE)
 - working on something else... for now
 - I'll be busy on Swift firstly... bye for now

@@ -29,6 +29,7 @@ It includes these files:
 - sci (v1.0000)
 - sciBeta (v1.0010)
 - sciElements (v1.0010)
+- SCI (v1.0015)
 - SCI2D (v1.0007)
 - SCI2DBeta (v1.0008)
 - SCON (v1.0013)

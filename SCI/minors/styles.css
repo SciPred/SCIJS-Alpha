@@ -1,0 +1,130 @@
+/* CSS SCI STUFF: classes only */
+
+body {margin: 0;}
+
+.sci-circle {border-radius: 50%;}
+.sci-round-l {border-radius: 16px;}
+.sci-round-m {border-radius: 8px;}
+.sci-round-s {border-radius: 4px;}
+.sci-round-xl {border-radius: 32px;}
+.sci-round-xs {border-radius: 2px;}
+
+.sci-bottom {bottom: 0;}
+.sci-fullscreen {bottom: 0; left: 0; right: 0; top: 0; position: fixed; width: 100%; height: 100%;}
+.sci-left {left: 0;}
+.sci-right {right: 0;}
+.sci-top {top: 0;}
+
+.sci-fh {height: 100%!important;}
+.sci-fw {width: 100%!important;}
+.sci-fwh {width: 100%!important; height: 100%!important;}
+
+.sci-margin {margin: 16px!important;}
+.sci-margin-auto {margin: auto;}
+.sci-margin-bottom {margin-bottom: 16px!important;}
+.sci-margin-left {margin-left: 16px!important;}
+.sci-margin-right {margin-right: 16px!important;}
+.sci-margin-top {margin-top: 16px!important;}
+
+.sci-panel {padding:0.01em 16px; margin-top: 16px; margin-bottom: 16px;}
+.sci-panel:after, .sci-panel:before {content:""; display:table; clear:both;}
+.sci-section {margin-top: 16px!important; margin-bottom: 16px!important;}
+
+.sci-padding {padding: 16px 16px 16px 16px!important;}
+.sci-padding-bottom {padding-bottom: 16px!important;}
+.sci-padding-left {padding-left: 16px!important;}
+.sci-padding-right {padding-right: 16px!important;}
+.sci-padding-top {padding-top: 16px!important;}
+
+.sci-pos-absolute {position: absolute;}
+.sci-pos-fixed {position: fixed;}
+.sci-pos-relative {position: relative;}
+.sci-pos-static {position: static;}
+.sci-pos-sticky {position: sticky;}
+
+.sci-border {border:1px solid #ccc!important}
+.sci-border-0 {border:0!important}
+.sci-border-bottom {border-bottom:1px solid #ccc!important}
+.sci-border-left {border-left:1px solid #ccc!important}
+.sci-border-right {border-right:1px solid #ccc!important}
+.sci-border-top {border-top:1px solid #ccc!important}
+
+.sci-bottombar {border-bottom:6px solid #ccc!important}
+.sci-leftbar {border-left:6px solid #ccc!important}
+.sci-rightbar {border-right:6px solid #ccc!important}
+.sci-topbar {border-top:6px solid #ccc!important}
+
+.sci-txt-tiny {font-size: 10px!important;}
+.sci-txt-xs {font-size: 15px!important;}
+.sci-txt-s {font-size: 20px!important;}
+.sci-txt-m {font-size: 25px!important;}
+.sci-txt-l {font-size: 30px!important;}
+.sci-txt-xl {font-size: 40px!important;}
+.sci-txt-xxl {font-size: 50px!important;}
+.sci-txt-xxxl {font-size: 60px!important;}
+.sci-txt-jumbo {font-size: 70px!important;}
+.sci-txt-super {font-size: 80px!important;}
+.sci-txt-mega {font-size: 100px!important;}
+
+.sci-center-align {text-align: center!important;}
+.sci-justify-align {text-align: justify!important;}
+.sci-left-align {text-align: left!important;}
+.sci-right-align {text-align: right!important;}
+
+/*COLORS*/
+.sci-bg-black {background-color: #000000!important;}
+.sci-border-black {border-color: #000000!important;}
+.sci-text-black {color: #000000!important;}
+
+.sci-bg-blue {background-color: #0000FF!important;}
+.sci-border-blue {border-color: #0000FF!important;}
+.sci-text-blue {color: #0000FF!important;}
+
+.sci-bg-gray {background-color: #808080!important;}
+.sci-border-gray {border-color: #808080!important;}
+.sci-text-gray {color: #808080!important;}
+
+.sci-bg-lime {background-color: #00FF00!important;}
+.sci-border-lime {border-color: #00FF00!important;}
+.sci-text-lime {color: #00FF00!important;}
+
+.sci-bg-maroon {background-color: #800000!important;}
+.sci-border-maroon {border-color: #800000!important;}
+.sci-text-maroon {color: #800000!important;}
+
+.sci-bg-red {background-color: #FF0000!important;}
+.sci-border-red {border-color: #FF0000!important;}
+.sci-text-red {color: #FF0000!important;}
+
+.sci-bg-silver {background-color: #C0C0C0!important;}
+.sci-border-silver {border-color: #C0C0C0!important;}
+.sci-text-silver {color: #C0C0C0!important;}
+
+.sci-bg-white {background-color: #FFFFFF!important;}
+.sci-border-white {border-color: #FFFFFF!important;}
+.sci-text-white {color: #FFFFFF!important;}
+
+.sci-bg-yellow {background-color: #FFFF00!important;}
+.sci-border-yellow {border-color: #FFFF00!important;}
+.sci-text-yellow {color: #FFFF00!important;}
+
+/*CUSTOM ELEMENT STYLES: SCI*/
+.sci-button {
+	border: 3px solid black; background-color: white; overflow: hidden; color: black; cursor: pointer;
+	max-height: 300px; max-width: 500px; min-height: 20px; min-width: 50px; font-size: 15px;
+}
+.sci-button:active {border-color: white; background-color: black; color: white;}
+.sci-button:hover {background-color: #ccc;}
+.sci-code {font-family: Consolas,"courier new"; font-size: 16px;}
+
+/*ANIMATIONS*/
+.sci-animate-fade-in {position: relative; animation: sci-fade-in 0.5s;}
+@keyframes sci-fade-in {from{opacity:0;} to{opacity:1;}}
+.sci-animate-fade-out {position: relative; animation: sci-fade-out 0.5s;}
+@keyframes sci-fade-out {from{opacity:1;} to{opacity:0;}}
+.sci-animate-fading {position: relative; animation: sci-fading 8s infinite;}
+@keyframes sci-fading {0%{opacity:0;}50%{opacity:1;}100%{opacity:0;}}
+.sci-animate-zoom-in {animation: sci-zoom-in 0.5s;}
+@keyframes sci-zoom-in {from{transform:scale(0);} to{transform:scale(1);}}
+.sci-animate-zoom-out {animation: sci-zoom-out 0.5s;}
+@keyframes sci-zoom-out {from{transform:scale(1);} to{transform:scale(0);}}

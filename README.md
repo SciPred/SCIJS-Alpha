@@ -24,6 +24,9 @@ It includes these files:
 - SOURCES.md (containing sources) because I give thanks
 - VERSIONS.md (containing the versions) because I don't do Git
 
+## CALCULATORS
+- found in MATH-CALCS
+
 ### CURRENT VARIABLES (with version of their addition):
 - Scanvas (v1.0003 added, v1.0007 renamed)
 - sci (v1.0000)

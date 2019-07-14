@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Calc 001</title>
+<link rel="stylesheet" type="text/css" href="setup.css"></link>
+</head>
+<body>
+<h1>QUADRATIC EQUATION SOLVER</h1><br>
+<h2>Calculator #1</h2>
+<hr>
+
+<h3>Inputs</h3><br>
+<p>A: <input id="a" type="text" placeholder="A" value="1"></input></p>
+<p>B: <input id="b" type="text" placeholder="B" value="0"></input></p>
+<p>C: <input id="c" type="text" placeholder="C" value="0"></input></p>
+
+<hr>
+
+<h3>Outputs</h3><br>
+<p id="x">X: {0, 0}</p><br>
+<p id="x1">X1: 0</p><br>
+<p id="x2">X2: 0</p><br>
+<p id="x1r">X1 Rounded: 0</p><br>
+<p id="x2r">X2 Rounded: 0</p><br>
+<p id="D">Discriminant: 0</p><br>
+<p id="sum">Sum of Roots: 0</p><br>
+<p id="prod">Product of Roots: 0</p><br>
+<p id="eq">Divided by A: ---</p><br>
+
+<script>
+var a = document.getElementById("a").value;
+var b = document.getElementById("b").value;
+var c = document.getElementById("c").value;
+var d = document.getElementById("D");
+var x = document.getElementById("x");
+var D, X1, X2;
+
+document.getElementById("a").oninput = setOuts;
+document.getElementById("b").oninput = setOuts;
+document.getElementById("c").oninput = setOuts;
+function setOuts() {
+	a = document.getElementById("a").value != NaN ? document.getElementById("a").value : 1;
+	b = document.getElementById("b").value != NaN ? document.getElementById("b").value : 0;
+	c = document.getElementById("c").value != NaN ? document.getElementById("c").value : 0;
+	D = (b ** 2) - (4 * a * c);
+	d.innerHTML = "Discriminant: " + D;
+	X1 = (-b + Math.sqrt(D))/(2 * a);
+	X2 = (-b - Math.sqrt(D))/(2 * a);
+	x.innerHTML = "X: {" + X1 + ", " + X2 + "}";
+	document.getElementById("x1").innerHTML = "X1: " + X1;
+	document.getElementById("x2").innerHTML = "X2: " + X2;
+	document.getElementById("x1r").innerHTML = "X1 Rounded: " + Math.round(X1 * 100) / 100;
+	document.getElementById("x2r").innerHTML = "X2 Rounded: " + Math.round(X2 * 100) / 100;
+	document.getElementById("sum").innerHTML = "Sum of Roots: " + (-b / a);
+	document.getElementById("prod").innerHTML = "Product of Roots: " + (c / a);
+	document.getElementById("eq").innerHTML = "Divided by A: x<sup>2</sup> + " + (b/a) + "x + " + (c/a) + " = 0";
+}
+setOuts();
+</script>
+</body>
+</html>

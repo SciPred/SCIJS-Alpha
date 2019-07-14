@@ -1,6 +1,9 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0016 (Calculator Beginning Update)
+- added MATH-CALCS... enjoy :)
+
 ### v1.0015 (SCI UPDATE)
  - I'm back... with SCI.js
  - any update in SCI.js files don't count as major updates like these

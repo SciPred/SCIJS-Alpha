@@ -1,0 +1,31 @@
+/*setup*/
+
+input, div, p, h1, h2, h3, h4, h5, h6 {display: inline-block; font-family: sans-serif; font-weight: bolder;}
+input {height: 20px; border-radius: 5px; background-color: #ccc; font-weight: bold; padding: 5px;}
+h1 {border: 2px solid #bbb; padding: 10px; border-radius: 2%; background-color: #ddd; box-shadow: 5px 7px 8px #888888; animation: scaleroo 5s infinite;}
+@keyframes scaleroo {0% {transform: scaleY(0);} 50% {transform: scaleY(1);} 100% {transform: scaleY(0);}}
+
+/*
+<!DOCTYPE html>
+<html>
+<head>
+<title>Calc #</title>
+<link rel="stylesheet" type="text/css" href="setup.css"></link>
+</head>
+<body>
+<h1></h1><br>
+<h2>Calculator #</h2>
+<hr>
+
+<h3>Inputs</h3><br>
+
+<hr>
+
+<h3>Outputs</h3><br>
+
+<script>
+
+</script>
+</body>
+</html>
+*/

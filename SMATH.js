@@ -601,6 +601,9 @@ if ( Object.assign === undefined ) {
 	};
 	exports.random = function(min, max) {};
 	exports.round = function(number) {return Math.round(number)};
+	exports.roundTo = function(number, digiter) {
+		return Math.round(number * digiter) / digiter;
+	};
 	exports.trunc = function(number) {return Math.trunc(number)};
 
 }));

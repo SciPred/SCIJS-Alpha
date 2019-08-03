@@ -13,7 +13,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = global || self, factory(global.sci = function(arg) {return arg}));
 }(this, function (exports) {'use strict';
-	var VERSION = "1.0015";
+	var VERSION = "1.0017";
 	//POLYFILLS, SETUPS AND CUSTOMS
 	if ( Math.sign === undefined ) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -89,14 +89,14 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 	function draggableHTML(elm, dragpart) {var pos1=0,pos2=0,pos3=0,pos4=0;
 		if (dragpart) {dragpart.onmousedown=dragMouseDown;} //dragpart is where the element is draggable
 		else {elm.onmousedown = dragMouseDown;}
-		function dragMouseDown(e) {e = e||window.event;
+		this.dragMouseDown = function(e) {e = e||window.event;
 			e.preventDefault();
 			pos3=e.clientX;
 			pos4=e.clientY;
 			document.onmouseup=closeDragElement;
 			document.onmousemove=elementDrag;
 		}
-		function elementDrag(e) {e = e||window.event;
+		this.elementDrag = function(e) {e = e||window.event;
 			e.preventDefault();
 			pos1=pos3 - e.clientX;
 			pos2=pos4 - e.clientY;
@@ -105,7 +105,7 @@ elm, sel and elmnt are supposed to be something like document.getElementById(id)
 			elm.style.top = (elm.offsetTop - pos2) + "px";
 			elm.style.left = (elm.offsetLeft - pos1) + "px";
 		}
-		function closeDragElement() {document.onmouseup = null;document.onmousemove = null;}
+		this.closeDragElement = function() {document.onmouseup = null;document.onmousemove = null;}
 	}//
 	function evtListener(evt, func, useCapture) {document.addEventListener(evt, func, useCapture)}//
 	function execCmd(cmd, keyId) {if(keyId==null||keyId==undefined){document.execCommand(cmd)}else{if(event.keyCode==keyId){document.execCommand(cmd)}}}//

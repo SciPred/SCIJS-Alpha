@@ -1,6 +1,11 @@
 # VERSIONS FOR THE FILES in SCIJS-Alpha
 
 ---
+### v1.0017
+- added one more calc
+- fixed draggableHTML to become a constructor
+- removed useless comments
+
 ### v1.0016 (Calculator Beginning Update)
 - added MATH-CALCS... enjoy :)
 

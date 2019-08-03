@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Calc 003</title>
+<link rel="stylesheet" type="text/css" href="setup.css"></link>
+</head>
+<body>
+<object type="text/html" data="TOC.html" style="background:#eee; width:30%; min-height:400px; border:2px solid black; float: right"></object>
+
+<h1>CIRCLE CALCULATOR</h1><br>
+<h2>Calculator #3</h2>
+<hr>
+
+<h3>Inputs</h3><br>
+<p>Radius: <input id="rad" type="text" placeholder="Radius" value="1"></input></p>
+
+<hr>
+
+<h3>Outputs</h3><br>
+<p id="dia">Diameter: </p><br>
+<p id="circum">Circumference: </p><br>
+<p id="semicircum">Semicircumference: </p><br>
+<p id="circumr">Rounded Circumference: </p><br>
+<p id="semicircumr">Rounded Semicircumference: </p><br>
+<p id="area">Area: </p><br>
+<p id="arear">Rounded Area: </p><br>
+<p id="halfarea">Half Area: </p><br>
+<p id="halfarear">Rounded Half Area: </p><br>
+
+<script>
+var rad = document.getElementById('rad');
+var radius;
+
+rad.oninput = setOuts;
+function setOuts() {
+	radius = Number(eval(rad.value)) || 0;
+	document.getElementById("dia").innerHTML = "Diameter: " + (radius * 2);
+	document.getElementById("circum").innerHTML = "Circumference: " + (radius * 2 * Math.PI);
+	document.getElementById("semicircum").innerHTML = "Semicircumference: " + (radius * Math.PI);
+	document.getElementById("circumr").innerHTML = "Rounded Circumference: " + Math.round(radius * 2 * Math.PI * 100) / 100;
+	document.getElementById("semicircumr").innerHTML = "Rounded Semicircumference: " + Math.round(radius * Math.PI * 100) / 100;
+	document.getElementById("area").innerHTML = "Area: " + (Math.PI * (radius ** 2));
+	document.getElementById("arear").innerHTML = "Rounded Area: " + Math.round(Math.PI * (radius ** 2) * 100) / 100;
+	document.getElementById("halfarea").innerHTML = "Half Area: " + (Math.PI * (radius ** 2) / 2);
+	document.getElementById("halfarear").innerHTML = "Rounded Half Area: " + Math.round(Math.PI * (radius ** 2) * 100 / 2) / 100;
+}
+setOuts();
+</script>
+</body>
+</html>

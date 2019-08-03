@@ -4,27 +4,34 @@ input, div, p, h1, h2, h3, h4, h5, h6 {display: inline-block; font-family: sans-
 input {height: 20px; border-radius: 5px; background-color: #ccc; font-weight: bold; padding: 5px;}
 h1 {border: 2px solid #bbb; padding: 10px; border-radius: 2%; background-color: #ddd; box-shadow: 5px 7px 8px #888888; animation: scaleroo 5s infinite;}
 @keyframes scaleroo {0% {transform: scaleY(0);} 50% {transform: scaleY(1);} 100% {transform: scaleY(0);}}
+h4 {color: red; border: 2px solid black; padding: 6px;}
 
 /*
 <!DOCTYPE html>
 <html>
 <head>
-<title>Calc #</title>
+<title>Calc 000</title>
 <link rel="stylesheet" type="text/css" href="setup.css"></link>
 </head>
 <body>
+<object type="text/html" data="TOC.html" style="background:#eee; width:30%; min-height:400px; border:2px solid black; float: right"></object>
+
 <h1></h1><br>
 <h2>Calculator #</h2>
 <hr>
 
 <h3>Inputs</h3><br>
+<p>: <input id="" type="text" placeholder="" value=""></input></p>
 
 <hr>
 
 <h3>Outputs</h3><br>
+<p id="">: </p><br>
 
 <script>
 
+function setOuts() {}
+setOuts();
 </script>
 </body>
 </html>
